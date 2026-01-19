@@ -80,34 +80,29 @@ This document tracks the implementation status and priority of all features for 
   - Fixed dashboard meals test to use exact match to avoid false positives
   - Enables reliable E2E testing and faster development iteration
 
+- [x] **Children Dashboard (Kiosk View)** (`src/routes/kinder-ansicht/`)
+  - Created `/kinder-ansicht` route for child-friendly kiosk display
+  - Playful design with bright colors, animated clouds and sun
+  - Large touch-friendly UI optimized for tablets/TVs
+  - Shows birthdays with celebratory confetti animations
+  - Displays today's meals, teachers on duty, and important announcements
+  - Important announcements displayed as scrolling banner
+  - Auto-refresh every 2 minutes for up-to-date information
+  - Added 6 E2E tests for kiosk functionality covering:
+    - Page rendering and accessibility
+    - Birthday displays and confetti animations
+    - Meal information display
+    - Teacher duty information
+    - Announcements display
+    - Auto-refresh functionality
+
 ---
 
 ## HIGH PRIORITY (Implement Next)
 
 These items have no external dependencies and provide immediate value:
 
-### 1. Children Dashboard (Kiosk View)
-
-**Why high priority**: Public display, no authentication needed, highly visible feature. No external dependencies.
-
-- [ ] **Create kiosk route** (`src/routes/kinder-ansicht/+page.svelte`)
-  - No authentication required (public kiosk display)
-  - Large, touch-friendly interface
-  - Tablet/TV optimized layout
-
-- [ ] **Kiosk page server loader** (`src/routes/kinder-ansicht/+page.server.js`)
-  - Load today's data (same as public dashboard)
-  - Load weather data (optional, can defer)
-
-- [ ] **Playful UI components for kiosk**
-  - Large clock display (reuse/enhance `Clock.svelte`)
-  - Birthday celebration component (confetti, large photos)
-  - Meal cards with food icons
-  - Teacher photos with names (large format)
-  - Bright colors, playful animations
-  - Auto-refresh every few minutes
-
-### 2. Database Schema for Roles
+### 1. Database Schema for Roles
 
 **Why high priority**: Foundation for all role-based features. No external dependencies.
 
@@ -153,9 +148,9 @@ These items have no external dependencies and provide immediate value:
 
 These items build on HIGH priority work or have soft dependencies:
 
-### 3. Role-Based Route Protection
+### 2. Role-Based Route Protection
 
-**Depends on**: Schema for Roles (HIGH #2)
+**Depends on**: Schema for Roles (HIGH #1)
 
 - [ ] **Create auth utility for role checking** (`src/lib/server/auth-utils.js`)
 
@@ -171,9 +166,9 @@ These items build on HIGH priority work or have soft dependencies:
 - [ ] **Add role to session data** (`src/lib/server/auth.js`)
   - Include role in session user object
 
-### 4. Admin User Management
+### 3. Admin User Management
 
-**Depends on**: Schema for Roles (HIGH #2)
+**Depends on**: Schema for Roles (HIGH #1)
 
 - [ ] **User management page** (`src/routes/admin/benutzer/+page.svelte`)
   - List all users with roles
@@ -183,9 +178,9 @@ These items build on HIGH priority work or have soft dependencies:
 - [ ] **User management API routes**
   - `src/routes/admin/benutzer/+page.server.js` - CRUD operations
 
-### 5. Admin Parent-Child Linking
+### 4. Admin Parent-Child Linking
 
-**Depends on**: Schema for Roles (HIGH #2), User Management (MEDIUM #4)
+**Depends on**: Schema for Roles (HIGH #1), User Management (MEDIUM #3)
 
 - [ ] **Parent management page** (`src/routes/admin/eltern/+page.svelte`)
   - List all parents
@@ -196,9 +191,9 @@ These items build on HIGH priority work or have soft dependencies:
 - [ ] **Parent management API routes**
   - `src/routes/admin/eltern/+page.server.js`
 
-### 6. Admin Employee-Teacher Linking
+### 5. Admin Employee-Teacher Linking
 
-**Depends on**: Schema for Roles (HIGH #2), User Management (MEDIUM #4)
+**Depends on**: Schema for Roles (HIGH #1), User Management (MEDIUM #3)
 
 - [ ] **Employee management page** (`src/routes/admin/mitarbeiter/+page.svelte`)
   - List all employees
@@ -208,9 +203,9 @@ These items build on HIGH priority work or have soft dependencies:
 - [ ] **Employee management API routes**
   - `src/routes/admin/mitarbeiter/+page.server.js`
 
-### 7. Parent Dashboard
+### 6. Parent Dashboard
 
-**Depends on**: Schema for Roles (HIGH #2), Role Protection (MEDIUM #3), Parent-Child Linking (MEDIUM #5)
+**Depends on**: Schema for Roles (HIGH #1), Role Protection (MEDIUM #2), Parent-Child Linking (MEDIUM #4)
 
 - [ ] **Parent layout with auth guard** (`src/routes/eltern/+layout.server.js`)
   - Require role: 'parent'
@@ -232,9 +227,9 @@ These items build on HIGH priority work or have soft dependencies:
   - View active announcements
   - Read-only
 
-### 8. Employee Dashboard
+### 7. Employee Dashboard
 
-**Depends on**: Schema for Roles (HIGH #2), Role Protection (MEDIUM #3), Employee-Teacher Linking (MEDIUM #6)
+**Depends on**: Schema for Roles (HIGH #1), Role Protection (MEDIUM #2), Employee-Teacher Linking (MEDIUM #5)
 
 - [ ] **Employee layout with auth guard** (`src/routes/mitarbeiter/+layout.server.js`)
   - Require role: 'employee'
@@ -253,9 +248,9 @@ These items build on HIGH priority work or have soft dependencies:
   - Children in their assigned groups
   - Group details
 
-### 9. Shared Dashboard Components
+### 8. Shared Dashboard Components
 
-**Depends on**: Children Dashboard (HIGH #1), Parent Dashboard (MEDIUM #7)
+**Depends on**: Children Dashboard (COMPLETED), Parent Dashboard (MEDIUM #6)
 
 - [ ] **Create dashboard components directory** (`src/lib/components/dashboard/`)
 
@@ -285,9 +280,9 @@ These items build on HIGH priority work or have soft dependencies:
 
 These items require external dependencies (API credentials) or are nice-to-have:
 
-### 10. Self-Registration Page
+### 9. Self-Registration Page
 
-**Depends on**: Schema for Roles (HIGH #2)
+**Depends on**: Schema for Roles (HIGH #1)
 **Note**: Can implement email/password registration without social login
 
 - [ ] **Registration page** (`src/routes/registrieren/+page.svelte`)
@@ -300,7 +295,7 @@ These items require external dependencies (API credentials) or are nice-to-have:
   - Create empty eltern record
   - Send verification email (if configured)
 
-### 11. Google OAuth Integration
+### 10. Google OAuth Integration
 
 **Requires**: Google Cloud Console credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
 
@@ -324,7 +319,7 @@ These items require external dependencies (API credentials) or are nice-to-have:
 
 - [ ] **Add Google sign-in button** to login and registration pages
 
-### 12. Apple Sign-In Integration
+### 11. Apple Sign-In Integration
 
 **Requires**: Apple Developer credentials (APPLE_CLIENT_ID, APPLE_CLIENT_SECRET, APPLE_TEAM_ID, APPLE_KEY_ID)
 **Note**: Requires HTTPS for callback (use ngrok for local dev)
@@ -353,16 +348,16 @@ These items require external dependencies (API credentials) or are nice-to-have:
 
 - [ ] **Add Apple sign-in button** to login and registration pages
 
-### 13. Social Login on Admin Login Page
+### 12. Social Login on Admin Login Page
 
-**Depends on**: Google OAuth (LOW #11) and/or Apple Sign-In (LOW #12)
+**Depends on**: Google OAuth (LOW #10) and/or Apple Sign-In (LOW #11)
 
 - [ ] **Update admin login page** (`src/routes/admin/login/+page.svelte`)
   - Add "Sign in with Google" button
   - Add "Sign in with Apple" button
   - Keep email/password as primary option
 
-### 14. Attendance Tracking (Future Version)
+### 13. Attendance Tracking (Future Version)
 
 **Status**: Explicitly deferred per implementation plan
 
@@ -377,20 +372,20 @@ These items require external dependencies (API credentials) or are nice-to-have:
 | Order | Item                           | Priority  | Dependencies | External Deps      |
 | ----- | ------------------------------ | --------- | ------------ | ------------------ |
 | ~~1~~ | ~~Modular Seed System~~        | COMPLETED | None         | None               |
-| 1     | Children Dashboard (Kiosk)     | HIGH      | None         | None               |
-| 2     | Database Schema for Roles      | HIGH      | None         | None               |
-| 3     | Role-Based Route Protection    | MEDIUM    | #2           | None               |
-| 4     | Admin User Management          | MEDIUM    | #2           | None               |
-| 5     | Admin Parent-Child Linking     | MEDIUM    | #2, #4       | None               |
-| 6     | Admin Employee-Teacher Linking | MEDIUM    | #2, #4       | None               |
-| 7     | Parent Dashboard               | MEDIUM    | #2, #3, #5   | None               |
-| 8     | Employee Dashboard             | MEDIUM    | #2, #3, #6   | None               |
-| 9     | Shared Dashboard Components    | MEDIUM    | #1, #7       | None               |
-| 10    | Self-Registration Page         | LOW       | #2           | None               |
-| 11    | Google OAuth                   | LOW       | #2           | Google credentials |
-| 12    | Apple Sign-In                  | LOW       | #2           | Apple credentials  |
-| 13    | Social Login Buttons           | LOW       | #11, #12     | OAuth credentials  |
-| 14    | Attendance Tracking            | DEFERRED  | Many         | None               |
+| ~~2~~ | ~~Children Dashboard (Kiosk)~~ | COMPLETED | None         | None               |
+| 1     | Database Schema for Roles      | HIGH      | None         | None               |
+| 2     | Role-Based Route Protection    | MEDIUM    | #1           | None               |
+| 3     | Admin User Management          | MEDIUM    | #1           | None               |
+| 4     | Admin Parent-Child Linking     | MEDIUM    | #1, #3       | None               |
+| 5     | Admin Employee-Teacher Linking | MEDIUM    | #1, #3       | None               |
+| 6     | Parent Dashboard               | MEDIUM    | #1, #2, #4   | None               |
+| 7     | Employee Dashboard             | MEDIUM    | #1, #2, #5   | None               |
+| 8     | Shared Dashboard Components    | MEDIUM    | (Kiosk), #6  | None               |
+| 9     | Self-Registration Page         | LOW       | #1           | None               |
+| 10    | Google OAuth                   | LOW       | #1           | Google credentials |
+| 11    | Apple Sign-In                  | LOW       | #1           | Apple credentials  |
+| 12    | Social Login Buttons           | LOW       | #10, #11     | OAuth credentials  |
+| 13    | Attendance Tracking            | DEFERRED  | Many         | None               |
 
 ---
 
@@ -403,11 +398,12 @@ npm run db:push                                     # Apply schema changes
 # Verify existing users have role='admin'
 ```
 
-### After Children Dashboard
+### Children Dashboard (COMPLETED)
 
 - Open `/kinder-ansicht` in browser
 - Verify playful design, large touch targets
 - Test on tablet/TV resolution
+- Run E2E tests: `npm run test:e2e -- kiosk.spec.ts`
 
 ### After Role-Based Dashboards
 
@@ -480,7 +476,11 @@ These test gaps should be addressed **before** implementing new features to ensu
 ### E2E Test Suite
 
 - One test is currently disabled: the auto-refresh test in the dashboard suite takes 30+ seconds to complete
-- All 19 active tests are passing and cover authentication, CRUD operations, and dashboard functionality
+- All 25 active tests are passing and cover:
+  - Authentication flows
+  - CRUD operations for groups, children, and teachers
+  - Public dashboard functionality
+  - Kiosk view functionality (6 tests)
 - No TODO/FIXME comments exist in the source code (codebase is well organized)
 - **See TEST COVERAGE GAPS section above for missing tests**
 
@@ -498,7 +498,8 @@ These test gaps should be addressed **before** implementing new features to ensu
 
 ### Dependency Chain Summary
 
-- Items 3-9 all depend on item 2 (Database Schema for Roles)
-- Items 5-6 additionally depend on item 4 (User Management)
-- Items 7-8 depend on their respective linking features (5 and 6)
-- The two remaining HIGH priority items (1, 2) have no dependencies and can be implemented in any order or in parallel
+- Database Schema for Roles (HIGH #1) has no dependencies and is the foundation for all role-based features
+- Items 2-8 all depend on Database Schema for Roles (HIGH #1)
+- Items 4-5 additionally depend on item 3 (User Management)
+- Items 6-7 depend on their respective linking features (4 and 5)
+- Shared Dashboard Components (MEDIUM #8) can leverage the completed Children Dashboard (Kiosk View)

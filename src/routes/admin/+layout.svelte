@@ -12,7 +12,8 @@
 		{ href: '/admin/erzieher', label: 'Erzieher', icon: '👩‍🏫' },
 		{ href: '/admin/dienstplan', label: 'Dienstplan', icon: '📅' },
 		{ href: '/admin/speiseplan', label: 'Speiseplan', icon: '🍽️' },
-		{ href: '/admin/ankuendigungen', label: 'Ankündigungen', icon: '📢' }
+		{ href: '/admin/ankuendigungen', label: 'Ankündigungen', icon: '📢' },
+		{ href: '/admin/benutzer', label: 'Benutzer', icon: '👤' }
 	];
 
 	async function handleLogout() {

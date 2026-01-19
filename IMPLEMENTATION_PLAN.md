@@ -1,7 +1,7 @@
 # Kita v2.0 Implementation Plan
 
 > **Last Updated:** 2026-01-19
-> **Status:** Phase 1 complete. Role-Based Route Protection (MEDIUM #1) complete. Ready for Admin User Management (MEDIUM #2).
+> **Status:** Phase 1 complete. Role-Based Route Protection (MEDIUM #1) complete. Admin User Management (MEDIUM #2) complete. Ready for Admin Parent-Child Linking (MEDIUM #3).
 
 ## Overview
 
@@ -160,17 +160,31 @@ These items build on completed HIGH priority work or have soft dependencies:
   - Calls `/api/test/set-role` after signup to set role to 'admin'
   - All 29 tests passing
 
-### 2. Admin User Management
+### 2. Admin User Management (COMPLETED)
 
 **Depends on**: Schema for Roles (COMPLETED)
 
-- [ ] **User management page** (`src/routes/admin/benutzer/+page.svelte`)
-  - List all users with roles
-  - Edit user roles (dropdown: admin/parent/employee)
-  - View user details
+- [x] **User management page** (`src/routes/admin/benutzer/+page.svelte`)
+  - List all users with role badges (color-coded: admin=red, employee=blue, parent=green)
+  - Search by name or email
+  - Filter by role (all/admin/employee/parent)
+  - Edit user roles with inline dropdown
+  - Delete users with confirmation modal
+  - Protection against deleting last admin
+  - Navigation link added to admin layout
 
-- [ ] **User management API routes**
-  - `src/routes/admin/benutzer/+page.server.js` - CRUD operations
+- [x] **User management API routes** (`src/routes/admin/benutzer/+page.server.js`)
+  - Load action: Fetch all users with roles
+  - `updateRole` action: Update user role with validation
+  - `delete` action: Delete user with last admin protection
+  - 9 E2E tests added in `e2e/benutzer.spec.js`:
+    - Page display and accessibility
+    - User filtering by role
+    - Search functionality
+    - Role editing with inline dropdown
+    - Delete confirmation modal
+    - Protection against deleting last admin
+    - Navigation from admin layout
 
 ### 3. Admin Parent-Child Linking
 
@@ -369,7 +383,7 @@ These items require external dependencies (API credentials) or are nice-to-have:
 | ~~2~~ | ~~Children Dashboard (Kiosk)~~  | COMPLETED | None                 | None               |
 | ~~3~~ | ~~Database Schema for Roles~~   | COMPLETED | None                 | None               |
 | ~~4~~ | ~~Role-Based Route Protection~~ | COMPLETED | Roles Schema         | None               |
-| 1     | Admin User Management           | MEDIUM    | Roles Schema         | None               |
+| ~~5~~ | ~~Admin User Management~~       | COMPLETED | Roles Schema         | None               |
 | 3     | Admin Parent-Child Linking      | MEDIUM    | Roles Schema, #2     | None               |
 | 4     | Admin Employee-Teacher Linking  | MEDIUM    | Roles Schema, #2     | None               |
 | 5     | Parent Dashboard                | MEDIUM    | Roles Schema, #1, #3 | None               |
@@ -415,6 +429,28 @@ These items require external dependencies (API credentials) or are nice-to-have:
   - Non-admin users accessing `/admin/*` -> redirected to their role's dashboard
   - Parent dashboard at `/eltern` (not yet implemented)
   - Employee dashboard at `/mitarbeiter` (not yet implemented)
+
+### Admin User Management (COMPLETED)
+
+- ✓ User management page implemented at `/admin/benutzer`
+- ✓ User list displays all users with color-coded role badges
+- ✓ Search functionality by name/email working
+- ✓ Filter functionality by role working (all/admin/employee/parent)
+- ✓ Inline role editing with dropdown implemented
+- ✓ Delete functionality with confirmation modal implemented
+- ✓ Protection against deleting last admin implemented
+- ✓ Navigation link added to admin layout sidebar
+- ✓ API routes with `updateRole` and `delete` actions implemented
+- ✓ 9 E2E tests passing in `e2e/benutzer.spec.js`
+- Verification:
+  - Visit `/admin/benutzer` as admin user
+  - Verify user list displays with role badges
+  - Test search by name and email
+  - Test filter dropdown (all roles, admin only, employee only, parent only)
+  - Test editing a user's role
+  - Test deleting a user (should show confirmation modal)
+  - Verify cannot delete last admin user
+  - Run E2E tests: `npm run test:e2e -- benutzer.spec.js`
 
 ### After Role-Based Dashboards
 
@@ -487,11 +523,12 @@ These test gaps should be addressed **before** implementing new features to ensu
 ### E2E Test Suite
 
 - One test is currently disabled: the auto-refresh test in the dashboard suite takes 30+ seconds to complete
-- All 29 active tests are passing and cover:
+- All 38 active tests are passing and cover:
   - Authentication flows (4 tests) - now with role-based auth
   - CRUD operations for groups, children, and teachers (11 tests)
   - Public dashboard functionality (10 tests)
   - Kiosk view functionality (6 tests)
+  - Admin user management (9 tests) - new in `e2e/benutzer.spec.js`
 - Tests use `createAdminUser()` helper to create admin users with proper role
 - Test-only endpoint `/api/test/set-role` allows setting user roles (dev mode only)
 - No TODO/FIXME comments exist in the source code (codebase is well organized)

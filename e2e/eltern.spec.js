@@ -89,9 +89,7 @@ test.describe('Parent Management (Eltern)', () => {
 		await expect(page.getByRole('main').getByRole('heading', { name: 'Eltern' })).toBeVisible();
 	});
 
-	test('should show no results message when searching for nonexistent parent', async ({
-		page
-	}) => {
+	test('should show no results message when searching for nonexistent parent', async ({ page }) => {
 		await page.goto('/admin/eltern');
 		await page.waitForLoadState('networkidle');
 

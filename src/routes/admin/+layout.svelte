@@ -14,7 +14,8 @@
 		{ href: '/admin/speiseplan', label: 'Speiseplan', icon: '🍽️' },
 		{ href: '/admin/ankuendigungen', label: 'Ankündigungen', icon: '📢' },
 		{ href: '/admin/benutzer', label: 'Benutzer', icon: '👤' },
-		{ href: '/admin/eltern', label: 'Eltern', icon: '👨‍👩‍👧' }
+		{ href: '/admin/eltern', label: 'Eltern', icon: '👨‍👩‍👧' },
+		{ href: '/admin/mitarbeiter', label: 'Mitarbeiter', icon: '👷' }
 	];
 
 	async function handleLogout() {

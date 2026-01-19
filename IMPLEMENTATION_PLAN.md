@@ -1,7 +1,7 @@
 # Kita v2.0 Implementation Plan
 
 > **Last Updated:** 2026-01-19
-> **Status:** Phase 1 complete. Role-Based Route Protection (MEDIUM #1) complete. Admin User Management (MEDIUM #2) complete. Admin Parent-Child Linking (MEDIUM #3) complete. Ready for Admin Employee-Teacher Linking (MEDIUM #4).
+> **Status:** Phase 1 complete. Role-Based Route Protection (MEDIUM #1) complete. Admin User Management (MEDIUM #2) complete. Admin Parent-Child Linking (MEDIUM #3) complete. Admin Employee-Teacher Linking (MEDIUM #4) complete. Ready for Parent Dashboard (MEDIUM #5).
 
 ## Overview
 
@@ -208,17 +208,27 @@ These items build on completed HIGH priority work or have soft dependencies:
 
 - [x] **Navigation link** added to admin layout sidebar
 
-### 4. Admin Employee-Teacher Linking
+### 4. Admin Employee-Teacher Linking (COMPLETED)
 
 **Depends on**: Schema for Roles (COMPLETED), User Management (MEDIUM #2)
 
-- [ ] **Employee management page** (`src/routes/admin/mitarbeiter/+page.svelte`)
-  - List all employees
-  - Link employee user to erzieher record
-  - Set position/title
+- [x] **Employee management page** (`src/routes/admin/mitarbeiter/+page.svelte`)
+  - List all employees with card-based UI
+  - Search by name, email, position, or linked erzieher name
+  - Edit employee profile (position)
+  - Link employees to erzieher records
+  - Unlink erzieher from employees with confirmation modal
+  - View employee's linked erzieher with photo display
+  - Counter showing filtered/total employees
 
-- [ ] **Employee management API routes**
-  - `src/routes/admin/mitarbeiter/+page.server.js`
+- [x] **Employee management API routes** (`src/routes/admin/mitarbeiter/+page.server.js`)
+  - Load action: Fetch all employee users with mitarbeiter profiles and linked erzieher
+  - `updateProfile` action: Update employee position
+  - `linkErzieher` action: Link an erzieher to employee (with duplicate check)
+  - `unlinkErzieher` action: Remove employee-erzieher link
+  - 7 E2E tests added in `e2e/mitarbeiter.spec.js`
+
+- [x] **Navigation link** added to admin layout sidebar
 
 ### 5. Parent Dashboard
 
@@ -386,23 +396,23 @@ These items require external dependencies (API credentials) or are nice-to-have:
 
 ## Implementation Order Summary
 
-| Order | Item                            | Priority  | Dependencies         | External Deps      |
-| ----- | ------------------------------- | --------- | -------------------- | ------------------ |
-| ~~1~~ | ~~Modular Seed System~~         | COMPLETED | None                 | None               |
-| ~~2~~ | ~~Children Dashboard (Kiosk)~~  | COMPLETED | None                 | None               |
-| ~~3~~ | ~~Database Schema for Roles~~   | COMPLETED | None                 | None               |
-| ~~4~~ | ~~Role-Based Route Protection~~ | COMPLETED | Roles Schema         | None               |
-| ~~5~~ | ~~Admin User Management~~       | COMPLETED | Roles Schema         | None               |
-| ~~6~~ | ~~Admin Parent-Child Linking~~  | COMPLETED | Roles Schema, #2     | None               |
-| 4     | Admin Employee-Teacher Linking  | MEDIUM    | Roles Schema, #2     | None               |
-| 5     | Parent Dashboard                | MEDIUM    | Roles Schema, #1, #3 | None               |
-| 6     | Employee Dashboard              | MEDIUM    | Roles Schema, #1, #4 | None               |
-| 7     | Shared Dashboard Components     | MEDIUM    | Kiosk, #5            | None               |
-| 8     | Self-Registration Page          | LOW       | Roles Schema         | None               |
-| 9     | Google OAuth                    | LOW       | Roles Schema         | Google credentials |
-| 10    | Apple Sign-In                   | LOW       | Roles Schema         | Apple credentials  |
-| 11    | Social Login Buttons            | LOW       | #9, #10              | OAuth credentials  |
-| 12    | Attendance Tracking             | DEFERRED  | Many                 | None               |
+| Order | Item                              | Priority  | Dependencies         | External Deps      |
+| ----- | --------------------------------- | --------- | -------------------- | ------------------ |
+| ~~1~~ | ~~Modular Seed System~~           | COMPLETED | None                 | None               |
+| ~~2~~ | ~~Children Dashboard (Kiosk)~~    | COMPLETED | None                 | None               |
+| ~~3~~ | ~~Database Schema for Roles~~     | COMPLETED | None                 | None               |
+| ~~4~~ | ~~Role-Based Route Protection~~   | COMPLETED | Roles Schema         | None               |
+| ~~5~~ | ~~Admin User Management~~         | COMPLETED | Roles Schema         | None               |
+| ~~6~~ | ~~Admin Parent-Child Linking~~    | COMPLETED | Roles Schema, #2     | None               |
+| ~~7~~ | ~~Admin Employee-Teacher Linking~~| COMPLETED | Roles Schema, #2     | None               |
+| 5     | Parent Dashboard                  | MEDIUM    | Roles Schema, #1, #3 | None               |
+| 6     | Employee Dashboard                | MEDIUM    | Roles Schema, #1, #4 | None               |
+| 7     | Shared Dashboard Components       | MEDIUM    | Kiosk, #5            | None               |
+| 8     | Self-Registration Page            | LOW       | Roles Schema         | None               |
+| 9     | Google OAuth                      | LOW       | Roles Schema         | Google credentials |
+| 10    | Apple Sign-In                     | LOW       | Roles Schema         | Apple credentials  |
+| 11    | Social Login Buttons              | LOW       | #9, #10              | OAuth credentials  |
+| 12    | Attendance Tracking               | DEFERRED  | Many                 | None               |
 
 ---
 
@@ -484,6 +494,29 @@ These items require external dependencies (API credentials) or are nice-to-have:
   - Test unlinking a child (should show confirmation modal)
   - Run E2E tests: `npm run test:e2e -- eltern.spec.js`
 
+### Admin Employee-Teacher Linking (COMPLETED)
+
+- ✓ Employee management page implemented at `/admin/mitarbeiter`
+- ✓ Card-based UI displaying all employee users
+- ✓ Search functionality by name, email, position, or linked erzieher name
+- ✓ Edit employee profile modal (position)
+- ✓ Link erzieher modal with erzieher selection
+- ✓ Unlink erzieher with confirmation modal
+- ✓ Linked erzieher display with photo
+- ✓ Counter showing filtered/total employees
+- ✓ Navigation link added to admin layout sidebar
+- ✓ API routes with `updateProfile`, `linkErzieher`, and `unlinkErzieher` actions
+- ✓ Duplicate check prevents linking erzieher already linked to another employee
+- ✓ 7 E2E tests passing in `e2e/mitarbeiter.spec.js`
+- Verification:
+  - Visit `/admin/mitarbeiter` as admin user
+  - Verify employee list displays with position and linked erzieher
+  - Test search by name, email, position, or erzieher name
+  - Test editing an employee's profile (position)
+  - Test linking an erzieher to an employee
+  - Test unlinking an erzieher (should show confirmation modal)
+  - Run E2E tests: `npm run test:e2e -- mitarbeiter.spec.js`
+
 ### After Role-Based Dashboards
 
 1. Login as admin -> stays at `/admin`
@@ -555,13 +588,14 @@ These test gaps should be addressed **before** implementing new features to ensu
 ### E2E Test Suite
 
 - One test is currently disabled: the auto-refresh test in the dashboard suite takes 30+ seconds to complete
-- All 45 active tests are passing and cover:
+- All 52 active tests are passing and cover:
   - Authentication flows (4 tests) - now with role-based auth
   - CRUD operations for groups, children, and teachers (11 tests)
   - Public dashboard functionality (10 tests)
   - Kiosk view functionality (6 tests)
   - Admin user management (9 tests) in `e2e/benutzer.spec.js`
   - Admin parent management (7 tests) in `e2e/eltern.spec.js`
+  - Admin employee management (7 tests) in `e2e/mitarbeiter.spec.js`
 - Tests use `createAdminUser()` helper to create admin users with proper role
 - Test-only endpoint `/api/test/set-role` allows setting user roles (dev mode only)
 - No TODO/FIXME comments exist in the source code (codebase is well organized)

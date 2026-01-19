@@ -290,3 +290,16 @@ Phase 10 (Dashboard) ─→ Phase 11 (Seed & Tests)
 | 10. Public Dashboard    | 8      | 8         |
 | 11. Seed Data & Testing | 4      | 4         |
 | **Total**               | **56** | **56**    |
+
+---
+
+## Maintenance Notes
+
+### v0.1.1 (2026-01-19)
+
+- Fixed ESLint errors (unused variables, catch blocks)
+- Applied Prettier formatting across all files
+- Updated `eslint.config.js` to disable overly strict Svelte navigation rules
+- Configured Playwright with retries for flaky network tests
+- Updated `AGENTS.md` with correct test commands
+- Created git tag `v0.1.1`

@@ -221,9 +221,9 @@
 | # | Task | Status | Spec File | Notes |
 |---|------|--------|-----------|-------|
 | 11.1 | Create seed script `scripts/seed.js` | `[x]` | [specs/11-seed-data.md](specs/11-seed-data.md) | Demo data for all tables |
-| 11.2 | Write E2E tests for login flow | `[ ]` | [specs/12-testing.md](specs/12-testing.md) | Replace demo.test.js |
-| 11.3 | Write E2E tests for CRUD operations | `[ ]` | [specs/12-testing.md](specs/12-testing.md) | Groups, children, teachers |
-| 11.4 | Write E2E tests for dashboard | `[ ]` | [specs/12-testing.md](specs/12-testing.md) | All sections visible |
+| 11.2 | Write E2E tests for login flow | `[x]` | [specs/12-testing.md](specs/12-testing.md) | 4 auth tests in e2e/auth.spec.js |
+| 11.3 | Write E2E tests for CRUD operations | `[x]` | [specs/12-testing.md](specs/12-testing.md) | 9 tests for Groups, Children, Teachers in e2e/crud.spec.js |
+| 11.4 | Write E2E tests for dashboard | `[x]` | [specs/12-testing.md](specs/12-testing.md) | 10 dashboard tests in e2e/dashboard.spec.js |
 
 ---
 
@@ -279,5 +279,5 @@ Phase 10 (Dashboard) ─→ Phase 11 (Seed & Tests)
 | 8. Meal Planning | 3 | 3 |
 | 9. Announcements | 4 | 4 |
 | 10. Public Dashboard | 8 | 8 |
-| 11. Seed Data & Testing | 4 | 1 |
-| **Total** | **56** | **53** |
+| 11. Seed Data & Testing | 4 | 4 |
+| **Total** | **56** | **56** |

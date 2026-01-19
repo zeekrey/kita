@@ -1,5 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import PhotoUpload from '$lib/components/PhotoUpload.svelte';
 
 	let { data, form } = $props();
@@ -61,9 +62,10 @@
 		editingChild = null;
 	}
 
-	function handleFormSuccess() {
+	async function handleFormSuccess() {
 		closeModal();
 		deleteConfirm = null;
+		await invalidateAll();
 	}
 </script>
 

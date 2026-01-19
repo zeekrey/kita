@@ -1,5 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data, form } = $props();
 
@@ -42,9 +43,10 @@
 		editingGroup = null;
 	}
 
-	function handleFormSuccess() {
+	async function handleFormSuccess() {
 		closeModal();
 		deleteConfirm = null;
+		await invalidateAll();
 	}
 </script>
 

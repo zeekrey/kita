@@ -1,305 +1,504 @@
-# Implementation Plan - Kita App
+# Kita v2.0 Implementation Plan
 
-> **Last Updated**: 2026-01-19
->
-> **Project Goal**: Build a kindergarten management application with admin CRUD interfaces for managing groups, children, teachers, schedules, meals, and announcements, plus a public dashboard for entrance display.
+> **Last Updated:** 2026-01-19
+> **Status:** Phase 1 complete. Ready for Phase 2 (HIGH priority items).
 
-## Current State Analysis
+## Overview
 
-### What's Already Implemented
-
-- SvelteKit v5.45.6 project scaffolding with Svelte 5
-- SQLite + Drizzle ORM v0.45.0 infrastructure (but only placeholder `user` table with `id`, `age`)
-- Tailwind CSS v4.1.17 configured via Vite
-- `better-sqlite3` v12.5.0 installed
-- Playwright v1.57.0 configured with placeholder test (`e2e/demo.test.js` - only checks h1 visibility)
-- TypeScript support configured
-- Database npm scripts: `db:push`, `db:generate`, `db:migrate`, `db:studio`
-- Basic routes: `/src/routes/+layout.svelte`, `/src/routes/+page.svelte` (default SvelteKit welcome page)
-
-### What's Missing (All Spec Items)
-
-**Phase 0 - Dependencies**:
-
-- `better-auth` package NOT installed
-- `bits-ui` package NOT installed
-- Google Fonts (Fraunces, Nunito) NOT configured in `app.html`
-- Font CSS variables NOT defined
-
-**Phase 1 - Database**:
-
-- All 6 required tables missing: `gruppen`, `kinder`, `erzieher`, `dienstplan`, `mahlzeiten`, `ankuendigungen`
-- Drizzle relations NOT defined
-- Migrations NOT run
-
-**Phase 2 - Authentication**:
-
-- `/src/lib/server/auth.js` - NOT EXISTS
-- `/src/lib/auth-client.js` - NOT EXISTS
-- `/src/routes/api/auth/[...all]/+server.js` - NOT EXISTS
-- `/src/routes/admin/login/+page.svelte` - NOT EXISTS
-- No admin routes exist at all
-
-**Phase 3 - File Uploads**:
-
-- `/static/uploads/` directory - NOT EXISTS
-- `/src/routes/api/upload/+server.js` - NOT EXISTS
-- `/src/lib/components/` directory - NOT EXISTS
-
-**Phases 4-9 - Admin CRUD Routes**:
-
-- All admin routes missing: `/admin/gruppen`, `/admin/kinder`, `/admin/erzieher`, `/admin/dienstplan`, `/admin/speiseplan`, `/admin/ankuendigungen`
-
-**Phase 10 - Dashboard**:
-
-- Current `+page.svelte` is default SvelteKit template (needs complete replacement)
-- `Clock.svelte` component - NOT EXISTS
-- No dashboard sections implemented
-
-**Phase 11 - Seed & Testing**:
-
-- `/scripts/` directory - NOT EXISTS
-- `/scripts/seed.js` - NOT EXISTS
-- E2E tests for auth/CRUD/dashboard - NOT EXISTS
+This document tracks the implementation status and priority of all features for the Kindergarten Management System. Items are organized by completion status and priority level.
 
 ---
 
-## Status Legend
+## COMPLETED
 
-- `[ ]` Pending
-- `[~]` In Progress
-- `[x]` Completed
+### Phase 1 - Core Application
 
----
+- [x] **Database schema** (`src/lib/server/db/schema.js`)
+  - Tables: `user`, `session`, `account`, `verification` (Better-Auth)
+  - Tables: `gruppen`, `kinder`, `erzieher`, `dienstplan`, `mahlzeiten`, `ankuendigungen`
+  - All relations defined with Drizzle ORM
 
-## Phase 0: Dependencies & Setup (Priority: CRITICAL)
+- [x] **Authentication system** (`src/lib/server/auth.js`)
+  - Better-Auth with email/password enabled
+  - Session management working
 
-> Must complete first - blocks all other phases.
+- [x] **Admin dashboard** (`src/routes/admin/`)
+  - Full CRUD for groups (`/admin/gruppen`)
+  - Full CRUD for children (`/admin/kinder`)
+  - Full CRUD for teachers (`/admin/erzieher`)
+  - Full CRUD for schedules (`/admin/dienstplan`)
+  - Full CRUD for meals (`/admin/speiseplan`)
+  - Full CRUD for announcements (`/admin/ankuendigungen`)
+  - Login page (`/admin/login`)
 
-| #   | Task                                      | Status | Spec File                                            | Notes                        |
-| --- | ----------------------------------------- | ------ | ---------------------------------------------------- | ---------------------------- |
-| 0.1 | Install better-auth                       | `[x]`  | [specs/00-dependencies.md](specs/00-dependencies.md) | Required for auth            |
-| 0.2 | Install bits-ui                           | `[x]`  | [specs/00-dependencies.md](specs/00-dependencies.md) | UI component library         |
-| 0.3 | Configure Google Fonts (Fraunces, Nunito) | `[x]`  | [specs/00-dependencies.md](specs/00-dependencies.md) | Update app.html + layout.css |
+- [x] **Public dashboard** (`src/routes/+page.svelte`)
+  - Today's birthdays display
+  - Today's meals display
+  - Teachers on duty display
+  - Active announcements display
 
----
+- [x] **File upload system** (`src/lib/components/PhotoUpload.svelte`)
+  - Photo uploads for children and teachers
+  - API endpoint at `/api/upload`
 
-## Phase 1: Database Schema (Priority: CRITICAL)
+- [x] **Shared components** (`src/lib/components/`)
+  - `Clock.svelte` - Live clock display
+  - `TimeSlotPicker.svelte` - Schedule time selection
+  - `PhotoUpload.svelte` - Image upload handling
 
-> Must complete before any CRUD features. Current schema.js only has a placeholder `user` table.
+- [x] **E2E test suite** (`e2e/`)
+  - 19 active tests covering auth, CRUD operations, and dashboard
+  - Tests for authentication flow
+  - Tests for all admin CRUD operations
+  - Tests for public dashboard functionality
 
-| #   | Task                                        | Status | Spec File                                                  | Notes                              |
-| --- | ------------------------------------------- | ------ | ---------------------------------------------------------- | ---------------------------------- |
-| 1.1 | Define `gruppen` table                      | `[x]`  | [specs/01-database-schema.md](specs/01-database-schema.md) | id, name, farbe, timestamps        |
-| 1.2 | Define `kinder` table                       | `[x]`  | [specs/01-database-schema.md](specs/01-database-schema.md) | FK to gruppen                      |
-| 1.3 | Define `erzieher` table                     | `[x]`  | [specs/01-database-schema.md](specs/01-database-schema.md) | unique email                       |
-| 1.4 | Define `dienstplan` table                   | `[x]`  | [specs/01-database-schema.md](specs/01-database-schema.md) | FK to erzieher                     |
-| 1.5 | Define `mahlzeiten` table                   | `[x]`  | [specs/01-database-schema.md](specs/01-database-schema.md) | typ: fruehstueck/mittagessen/snack |
-| 1.6 | Define `ankuendigungen` table               | `[x]`  | [specs/01-database-schema.md](specs/01-database-schema.md) | prioritaet: normal/wichtig         |
-| 1.7 | Add Drizzle relations                       | `[x]`  | [specs/01-database-schema.md](specs/01-database-schema.md) | For proper joins                   |
-| 1.8 | Run database migrations (`bun run db:push`) | `[x]`  | [specs/01-database-schema.md](specs/01-database-schema.md) | Creates all tables                 |
+- [x] **Basic seed script** (`scripts/seed.js`)
+  - Single monolithic profile with demo data
+  - Creates groups, children, teachers, schedules, meals, announcements
 
----
+- [x] **Specification documents** (`specs/`)
+  - 13 spec files covering all core features
 
-## Phase 2: Authentication (Priority: HIGH)
-
-> Blocks all admin routes. Depends on Phase 0 (better-auth) and Phase 1 (database).
-
-| #   | Task                                       | Status | Spec File                                                | Notes                              |
-| --- | ------------------------------------------ | ------ | -------------------------------------------------------- | ---------------------------------- |
-| 2.1 | Create `src/lib/server/auth.js`            | `[x]`  | [specs/02-authentication.md](specs/02-authentication.md) | better-auth config with SQLite     |
-| 2.2 | Create `src/lib/auth-client.js`            | `[x]`  | [specs/02-authentication.md](specs/02-authentication.md) | Client-side auth                   |
-| 2.3 | Create auth API route `/api/auth/[...all]` | `[x]`  | [specs/02-authentication.md](specs/02-authentication.md) | Handles auth endpoints             |
-| 2.4 | Create login page `/admin/login`           | `[x]`  | [specs/02-authentication.md](specs/02-authentication.md) | German labels                      |
-| 2.5 | Create admin layout with auth guard        | `[x]`  | [specs/02-authentication.md](specs/02-authentication.md) | +layout.server.js + +layout.svelte |
-| 2.6 | Add logout functionality                   | `[x]`  | [specs/02-authentication.md](specs/02-authentication.md) | Button in admin header             |
-
----
-
-## Phase 3: File Uploads (Priority: MEDIUM)
-
-> Needed before children/teachers management for photo uploads.
-
-| #   | Task                                               | Status | Spec File                                            | Notes                                      |
-| --- | -------------------------------------------------- | ------ | ---------------------------------------------------- | ------------------------------------------ |
-| 3.1 | Create `static/uploads/` directory with `.gitkeep` | `[x]`  | [specs/03-file-uploads.md](specs/03-file-uploads.md) | Storage location                           |
-| 3.2 | Create upload API endpoint                         | `[x]`  | [specs/03-file-uploads.md](specs/03-file-uploads.md) | Validate type/size, generate UUID filename |
-| 3.3 | Create PhotoUpload.svelte component                | `[x]`  | [specs/03-file-uploads.md](specs/03-file-uploads.md) | Preview, loading, error states             |
-
----
-
-## Phase 4: Groups Management (Priority: MEDIUM)
-
-> Simplest CRUD - good starting point. Required before children (FK dependency).
-
-| #   | Task                                     | Status | Spec File                                                      | Notes                        |
-| --- | ---------------------------------------- | ------ | -------------------------------------------------------------- | ---------------------------- |
-| 4.1 | Create groups list page `/admin/gruppen` | `[x]`  | [specs/04-groups-management.md](specs/04-groups-management.md) | Sorted alphabetically        |
-| 4.2 | Create add group form                    | `[x]`  | [specs/04-groups-management.md](specs/04-groups-management.md) | Color picker with 10 presets |
-| 4.3 | Create edit group form                   | `[x]`  | [specs/04-groups-management.md](specs/04-groups-management.md) | Pre-filled values            |
-| 4.4 | Implement delete group with protection   | `[x]`  | [specs/04-groups-management.md](specs/04-groups-management.md) | Block if has children        |
+- [x] **Modular seed system** (`scripts/seed.js` and `scripts/seeds/`)
+  - Created modular seed system with 3 distinct profiles: testing, demo, inspection
+  - CLI orchestrator with `-p`/`--profile` flag support (includes `--help` documentation)
+  - **Testing profile** (`scripts/seeds/testing.js`):
+    - Deterministic data for E2E tests
+    - Uses `test-` prefixed IDs (e.g., `test-group-1`, `test-child-1`)
+    - Minimal data: 2 groups, 3 children, 2 teachers
+    - Fixed dates relative to test execution
+  - **Demo profile** (`scripts/seeds/demo.js`):
+    - Realistic showcase data for demonstrations
+    - 5 groups with German names
+    - 25 children with realistic German names
+    - 8 teachers
+    - 2 weeks of schedules, meals, and announcements
+  - **Inspection profile** (`scripts/seeds/inspection.js`):
+    - Edge case testing: long names, special characters, boundary dates
+    - XSS/injection test strings
+    - Empty and overcrowded groups
+  - Fixed dashboard meals test to use exact match to avoid false positives
+  - Enables reliable E2E testing and faster development iteration
 
 ---
 
-## Phase 5: Children Management (Priority: MEDIUM)
+## HIGH PRIORITY (Implement Next)
 
-> Depends on Phase 3 (file uploads) and Phase 4 (groups).
+These items have no external dependencies and provide immediate value:
 
-| #   | Task                                      | Status | Spec File                                                          | Notes                                     |
-| --- | ----------------------------------------- | ------ | ------------------------------------------------------------------ | ----------------------------------------- |
-| 5.1 | Create children list page `/admin/kinder` | `[x]`  | [specs/05-children-management.md](specs/05-children-management.md) | Photo, name, birthday, group badge        |
-| 5.2 | Create add child form with photo upload   | `[x]`  | [specs/05-children-management.md](specs/05-children-management.md) | Uses PhotoUpload component                |
-| 5.3 | Create edit child form                    | `[x]`  | [specs/05-children-management.md](specs/05-children-management.md) | Pre-filled with existing photo            |
-| 5.4 | Implement delete child                    | `[x]`  | [specs/05-children-management.md](specs/05-children-management.md) | Confirmation dialog                       |
-| 5.5 | Add search/filter functionality           | `[x]`  | [specs/05-children-management.md](specs/05-children-management.md) | Client-side search, group dropdown filter |
+### 1. Children Dashboard (Kiosk View)
 
----
+**Why high priority**: Public display, no authentication needed, highly visible feature. No external dependencies.
 
-## Phase 6: Teachers Management (Priority: MEDIUM)
+- [ ] **Create kiosk route** (`src/routes/kinder-ansicht/+page.svelte`)
+  - No authentication required (public kiosk display)
+  - Large, touch-friendly interface
+  - Tablet/TV optimized layout
 
-> Depends on Phase 3 (file uploads). Required before schedule management.
+- [ ] **Kiosk page server loader** (`src/routes/kinder-ansicht/+page.server.js`)
+  - Load today's data (same as public dashboard)
+  - Load weather data (optional, can defer)
 
-| #   | Task                                        | Status | Spec File                                                          | Notes                         |
-| --- | ------------------------------------------- | ------ | ------------------------------------------------------------------ | ----------------------------- |
-| 6.1 | Create teachers list page `/admin/erzieher` | `[x]`  | [specs/06-teachers-management.md](specs/06-teachers-management.md) | Photo, name, email            |
-| 6.2 | Create add teacher form with photo upload   | `[x]`  | [specs/06-teachers-management.md](specs/06-teachers-management.md) | Email uniqueness validation   |
-| 6.3 | Create edit teacher form                    | `[x]`  | [specs/06-teachers-management.md](specs/06-teachers-management.md) | Pre-filled values             |
-| 6.4 | Implement delete teacher with protection    | `[x]`  | [specs/06-teachers-management.md](specs/06-teachers-management.md) | Block if has schedule entries |
+- [ ] **Playful UI components for kiosk**
+  - Large clock display (reuse/enhance `Clock.svelte`)
+  - Birthday celebration component (confetti, large photos)
+  - Meal cards with food icons
+  - Teacher photos with names (large format)
+  - Bright colors, playful animations
+  - Auto-refresh every few minutes
 
----
+### 2. Database Schema for Roles
 
-## Phase 7: Schedule Management (Priority: MEDIUM)
+**Why high priority**: Foundation for all role-based features. No external dependencies.
 
-> Depends on Phase 6 (teachers).
+- [ ] **Add role column to user table** (`src/lib/server/db/schema.js`)
 
-| #   | Task                                       | Status | Spec File                                                          | Notes                                    |
-| --- | ------------------------------------------ | ------ | ------------------------------------------------------------------ | ---------------------------------------- |
-| 7.1 | Create schedule page `/admin/dienstplan`   | `[x]`  | [specs/07-schedule-management.md](specs/07-schedule-management.md) | Week navigation                          |
-| 7.2 | Create weekly calendar grid view           | `[x]`  | [specs/07-schedule-management.md](specs/07-schedule-management.md) | Rows=teachers, Cols=Mon-Fri              |
-| 7.3 | Create TimeSlotPicker component            | `[x]`  | [specs/07-schedule-management.md](specs/07-schedule-management.md) | Presets: Frühdienst, Spätdienst, Ganztag |
-| 7.4 | Implement add/edit/delete schedule entries | `[x]`  | [specs/07-schedule-management.md](specs/07-schedule-management.md) | Date helpers                             |
+  ```javascript
+  role: text('role').notNull().default('parent'); // 'admin' | 'parent' | 'employee'
+  ```
 
----
+- [ ] **Create eltern (parents) table** (`src/lib/server/db/schema.js`)
+  - `id` (primary key)
+  - `userId` (FK to user)
+  - `telefon` (phone)
+  - `adresse` (address)
+  - `createdAt`, `updatedAt` timestamps
 
-## Phase 8: Meal Planning (Priority: MEDIUM)
+- [ ] **Create eltern_kinder junction table** (`src/lib/server/db/schema.js`)
+  - `id` (primary key)
+  - `elternId` (FK to eltern)
+  - `kindId` (FK to kinder)
+  - `beziehung` ('mutter' | 'vater' | 'erziehungsberechtigter')
 
-> Independent of other CRUD phases. Only needs database.
+- [ ] **Create mitarbeiter (employees) table** (`src/lib/server/db/schema.js`)
+  - `id` (primary key)
+  - `userId` (FK to user)
+  - `erzieherId` (FK to erzieher, optional)
+  - `position` (job title)
+  - `createdAt`, `updatedAt` timestamps
 
-| #   | Task                                          | Status | Spec File                                              | Notes                            |
-| --- | --------------------------------------------- | ------ | ------------------------------------------------------ | -------------------------------- |
-| 8.1 | Create meal planning page `/admin/speiseplan` | `[x]`  | [specs/08-meal-planning.md](specs/08-meal-planning.md) | Week view                        |
-| 8.2 | Create weekly meal planner grid               | `[x]`  | [specs/08-meal-planning.md](specs/08-meal-planning.md) | Rows=meal types, Cols=Mon-Fri    |
-| 8.3 | Implement add/edit/delete meals               | `[x]`  | [specs/08-meal-planning.md](specs/08-meal-planning.md) | Prevent duplicates per type/date |
+- [ ] **Add Drizzle relations for new tables**
+  - User -> eltern (one-to-one)
+  - User -> mitarbeiter (one-to-one)
+  - eltern <-> kinder (many-to-many via junction)
+  - mitarbeiter -> erzieher (one-to-one optional)
 
----
-
-## Phase 9: Announcements (Priority: MEDIUM)
-
-> Independent of other CRUD phases. Only needs database.
-
-| #   | Task                                              | Status | Spec File                                              | Notes                                 |
-| --- | ------------------------------------------------- | ------ | ------------------------------------------------------ | ------------------------------------- |
-| 9.1 | Create announcements page `/admin/ankuendigungen` | `[x]`  | [specs/09-announcements.md](specs/09-announcements.md) | List with status badges               |
-| 9.2 | Create add/edit announcement form                 | `[x]`  | [specs/09-announcements.md](specs/09-announcements.md) | Date pickers                          |
-| 9.3 | Implement validity period logic                   | `[x]`  | [specs/09-announcements.md](specs/09-announcements.md) | gueltigVon <= gueltigBis              |
-| 9.4 | Implement priority levels                         | `[x]`  | [specs/09-announcements.md](specs/09-announcements.md) | normal/wichtig with visual indicators |
-
----
-
-## Phase 10: Public Dashboard (Priority: HIGH)
-
-> The main deliverable. Depends on all data being in database.
-
-| #    | Task                                      | Status | Spec File                                      | Notes                               |
-| ---- | ----------------------------------------- | ------ | ---------------------------------------------- | ----------------------------------- |
-| 10.1 | Create dashboard layout (16:9 widescreen) | `[x]`  | [specs/10-dashboard.md](specs/10-dashboard.md) | Replace current +page.svelte        |
-| 10.2 | Create Clock component                    | `[x]`  | [specs/10-dashboard.md](specs/10-dashboard.md) | Updates every second, German locale |
-| 10.3 | Implement announcements section           | `[x]`  | [specs/10-dashboard.md](specs/10-dashboard.md) | Active only, wichtig highlighted    |
-| 10.4 | Implement birthday section                | `[x]`  | [specs/10-dashboard.md](specs/10-dashboard.md) | Today's birthdays with photos       |
-| 10.5 | Implement meals section                   | `[x]`  | [specs/10-dashboard.md](specs/10-dashboard.md) | Today's 3 meals with icons          |
-| 10.6 | Implement teachers on duty section        | `[x]`  | [specs/10-dashboard.md](specs/10-dashboard.md) | Currently scheduled with photos     |
-| 10.7 | Implement auto-refresh (30s polling)      | `[x]`  | [specs/10-dashboard.md](specs/10-dashboard.md) | Client-side invalidation            |
-| 10.8 | Add entrance animations                   | `[x]`  | [specs/10-dashboard.md](specs/10-dashboard.md) | Staggered fade-slide                |
+- [ ] **Run migration**
+  - `npm run db:push` or `npm run db:migrate`
+  - Handle existing users: set role to 'admin'
 
 ---
 
-## Phase 11: Seed Data & Testing (Priority: LOW)
+## MEDIUM PRIORITY
 
-> Final polish. Seed data helps demo; tests ensure quality.
+These items build on HIGH priority work or have soft dependencies:
 
-| #    | Task                                 | Status | Spec File                                      | Notes                                                      |
-| ---- | ------------------------------------ | ------ | ---------------------------------------------- | ---------------------------------------------------------- |
-| 11.1 | Create seed script `scripts/seed.js` | `[x]`  | [specs/11-seed-data.md](specs/11-seed-data.md) | Demo data for all tables                                   |
-| 11.2 | Write E2E tests for login flow       | `[x]`  | [specs/12-testing.md](specs/12-testing.md)     | 4 auth tests in e2e/auth.spec.js                           |
-| 11.3 | Write E2E tests for CRUD operations  | `[x]`  | [specs/12-testing.md](specs/12-testing.md)     | 9 tests for Groups, Children, Teachers in e2e/crud.spec.js |
-| 11.4 | Write E2E tests for dashboard        | `[x]`  | [specs/12-testing.md](specs/12-testing.md)     | 10 dashboard tests in e2e/dashboard.spec.js                |
+### 3. Role-Based Route Protection
+
+**Depends on**: Schema for Roles (HIGH #2)
+
+- [ ] **Create auth utility for role checking** (`src/lib/server/auth-utils.js`)
+
+  ```javascript
+  export function requireRole(session, allowedRoles) { ... }
+  export function getDashboardForRole(role) { ... }
+  ```
+
+- [ ] **Update admin layout guard** (`src/routes/admin/+layout.server.js`)
+  - Check for 'admin' role
+  - Redirect non-admins to appropriate dashboard
+
+- [ ] **Add role to session data** (`src/lib/server/auth.js`)
+  - Include role in session user object
+
+### 4. Admin User Management
+
+**Depends on**: Schema for Roles (HIGH #2)
+
+- [ ] **User management page** (`src/routes/admin/benutzer/+page.svelte`)
+  - List all users with roles
+  - Edit user roles (dropdown: admin/parent/employee)
+  - View user details
+
+- [ ] **User management API routes**
+  - `src/routes/admin/benutzer/+page.server.js` - CRUD operations
+
+### 5. Admin Parent-Child Linking
+
+**Depends on**: Schema for Roles (HIGH #2), User Management (MEDIUM #4)
+
+- [ ] **Parent management page** (`src/routes/admin/eltern/+page.svelte`)
+  - List all parents
+  - Link parents to children (multi-select)
+  - Set relationship type (mother/father/guardian)
+  - View parent's linked children
+
+- [ ] **Parent management API routes**
+  - `src/routes/admin/eltern/+page.server.js`
+
+### 6. Admin Employee-Teacher Linking
+
+**Depends on**: Schema for Roles (HIGH #2), User Management (MEDIUM #4)
+
+- [ ] **Employee management page** (`src/routes/admin/mitarbeiter/+page.svelte`)
+  - List all employees
+  - Link employee user to erzieher record
+  - Set position/title
+
+- [ ] **Employee management API routes**
+  - `src/routes/admin/mitarbeiter/+page.server.js`
+
+### 7. Parent Dashboard
+
+**Depends on**: Schema for Roles (HIGH #2), Role Protection (MEDIUM #3), Parent-Child Linking (MEDIUM #5)
+
+- [ ] **Parent layout with auth guard** (`src/routes/eltern/+layout.server.js`)
+  - Require role: 'parent'
+  - Redirect if not parent
+
+- [ ] **Parent home page** (`src/routes/eltern/+page.svelte`)
+  - Overview of their children
+  - Today's summary
+
+- [ ] **Parent children view** (`src/routes/eltern/kinder/+page.svelte`)
+  - View only their linked children
+  - Child details, group info
+
+- [ ] **Parent meal plan view** (`src/routes/eltern/speiseplan/+page.svelte`)
+  - Weekly meal plan display
+  - Read-only
+
+- [ ] **Parent announcements view** (`src/routes/eltern/nachrichten/+page.svelte`)
+  - View active announcements
+  - Read-only
+
+### 8. Employee Dashboard
+
+**Depends on**: Schema for Roles (HIGH #2), Role Protection (MEDIUM #3), Employee-Teacher Linking (MEDIUM #6)
+
+- [ ] **Employee layout with auth guard** (`src/routes/mitarbeiter/+layout.server.js`)
+  - Require role: 'employee'
+  - Redirect if not employee
+
+- [ ] **Employee home page** (`src/routes/mitarbeiter/+page.svelte`)
+  - Personal schedule prominently displayed
+  - Quick access to their groups
+  - Today's summary
+
+- [ ] **Employee schedule view** (`src/routes/mitarbeiter/dienstplan/+page.svelte`)
+  - Personal schedule (filtered to their erzieher record)
+  - Weekly view
+
+- [ ] **Employee groups view** (`src/routes/mitarbeiter/gruppen/+page.svelte`)
+  - Children in their assigned groups
+  - Group details
+
+### 9. Shared Dashboard Components
+
+**Depends on**: Children Dashboard (HIGH #1), Parent Dashboard (MEDIUM #7)
+
+- [ ] **Create dashboard components directory** (`src/lib/components/dashboard/`)
+
+- [ ] **AnnouncementCard.svelte**
+  - Reusable announcement display
+  - Priority indicator (normal/wichtig)
+
+- [ ] **MealCard.svelte**
+  - Meal display with type icon
+  - Used in all dashboards
+
+- [ ] **TeacherCard.svelte**
+  - Teacher photo and name
+  - Schedule time display
+
+- [ ] **BirthdayCard.svelte**
+  - Birthday celebration display
+  - Child photo and age
+
+- [ ] **ChildCard.svelte**
+  - Child info display
+  - Used in parent/employee dashboards
 
 ---
 
-## Dependency Graph
+## LOW PRIORITY / DEFERRED
+
+These items require external dependencies (API credentials) or are nice-to-have:
+
+### 10. Self-Registration Page
+
+**Depends on**: Schema for Roles (HIGH #2)
+**Note**: Can implement email/password registration without social login
+
+- [ ] **Registration page** (`src/routes/registrieren/+page.svelte`)
+  - Email/password registration form
+  - Role selection (parent only for self-registration)
+  - Terms acceptance
+
+- [ ] **Registration server action** (`src/routes/registrieren/+page.server.js`)
+  - Create user with 'parent' role
+  - Create empty eltern record
+  - Send verification email (if configured)
+
+### 11. Google OAuth Integration
+
+**Requires**: Google Cloud Console credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
+
+- [ ] **Configure Google provider** (`src/lib/server/auth.js`)
+
+  ```javascript
+  socialProviders: {
+    google: {
+      clientId: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET
+    }
+  }
+  ```
+
+- [ ] **Add environment variables** (`.env`)
+
+  ```
+  GOOGLE_CLIENT_ID=
+  GOOGLE_CLIENT_SECRET=
+  ```
+
+- [ ] **Add Google sign-in button** to login and registration pages
+
+### 12. Apple Sign-In Integration
+
+**Requires**: Apple Developer credentials (APPLE_CLIENT_ID, APPLE_CLIENT_SECRET, APPLE_TEAM_ID, APPLE_KEY_ID)
+**Note**: Requires HTTPS for callback (use ngrok for local dev)
+
+- [ ] **Configure Apple provider** (`src/lib/server/auth.js`)
+
+  ```javascript
+  socialProviders: {
+    apple: {
+      clientId: APPLE_CLIENT_ID,
+      clientSecret: APPLE_CLIENT_SECRET,
+      teamId: APPLE_TEAM_ID,
+      keyId: APPLE_KEY_ID
+    }
+  }
+  ```
+
+- [ ] **Add environment variables** (`.env`)
+
+  ```
+  APPLE_CLIENT_ID=
+  APPLE_CLIENT_SECRET=
+  APPLE_TEAM_ID=
+  APPLE_KEY_ID=
+  ```
+
+- [ ] **Add Apple sign-in button** to login and registration pages
+
+### 13. Social Login on Admin Login Page
+
+**Depends on**: Google OAuth (LOW #11) and/or Apple Sign-In (LOW #12)
+
+- [ ] **Update admin login page** (`src/routes/admin/login/+page.svelte`)
+  - Add "Sign in with Google" button
+  - Add "Sign in with Apple" button
+  - Keep email/password as primary option
+
+### 14. Attendance Tracking (Future Version)
+
+**Status**: Explicitly deferred per implementation plan
+
+- [ ] Employee check-in/check-out for children
+- [ ] Attendance history
+- [ ] Attendance reports
+
+---
+
+## Implementation Order Summary
+
+| Order | Item                           | Priority  | Dependencies | External Deps      |
+| ----- | ------------------------------ | --------- | ------------ | ------------------ |
+| ~~1~~ | ~~Modular Seed System~~        | COMPLETED | None         | None               |
+| 1     | Children Dashboard (Kiosk)     | HIGH      | None         | None               |
+| 2     | Database Schema for Roles      | HIGH      | None         | None               |
+| 3     | Role-Based Route Protection    | MEDIUM    | #2           | None               |
+| 4     | Admin User Management          | MEDIUM    | #2           | None               |
+| 5     | Admin Parent-Child Linking     | MEDIUM    | #2, #4       | None               |
+| 6     | Admin Employee-Teacher Linking | MEDIUM    | #2, #4       | None               |
+| 7     | Parent Dashboard               | MEDIUM    | #2, #3, #5   | None               |
+| 8     | Employee Dashboard             | MEDIUM    | #2, #3, #6   | None               |
+| 9     | Shared Dashboard Components    | MEDIUM    | #1, #7       | None               |
+| 10    | Self-Registration Page         | LOW       | #2           | None               |
+| 11    | Google OAuth                   | LOW       | #2           | Google credentials |
+| 12    | Apple Sign-In                  | LOW       | #2           | Apple credentials  |
+| 13    | Social Login Buttons           | LOW       | #11, #12     | OAuth credentials  |
+| 14    | Attendance Tracking            | DEFERRED  | Many         | None               |
+
+---
+
+## Verification Checklist
+
+### After Role Schema
+
+```bash
+npm run db:push                                     # Apply schema changes
+# Verify existing users have role='admin'
+```
+
+### After Children Dashboard
+
+- Open `/kinder-ansicht` in browser
+- Verify playful design, large touch targets
+- Test on tablet/TV resolution
+
+### After Role-Based Dashboards
+
+1. Login as admin -> stays at `/admin`
+2. Login as parent -> redirects to `/eltern`
+3. Login as employee -> redirects to `/mitarbeiter`
+4. Verify data isolation (parents only see their children)
+
+---
+
+## Key Files Reference
+
+| Category             | File Path                                |
+| -------------------- | ---------------------------------------- |
+| Database Schema      | `src/lib/server/db/schema.js`            |
+| Auth Config          | `src/lib/server/auth.js`                 |
+| Seed Orchestrator    | `scripts/seed.js`                        |
+| Seed Profiles        | `scripts/seeds/*.js`                     |
+| Public Dashboard     | `src/routes/+page.svelte`                |
+| Admin Routes         | `src/routes/admin/**`                    |
+| Parent Routes        | `src/routes/eltern/**`                   |
+| Employee Routes      | `src/routes/mitarbeiter/**`              |
+| Kiosk Route          | `src/routes/kinder-ansicht/+page.svelte` |
+| Shared Components    | `src/lib/components/`                    |
+| Dashboard Components | `src/lib/components/dashboard/`          |
+| E2E Tests            | `e2e/`                                   |
+| Specifications       | `specs/`                                 |
+
+---
+
+## TEST COVERAGE GAPS
+
+The following E2E test coverage gaps have been identified and should be addressed:
+
+### Missing CRUD Tests
+
+| Entity                  | Create     | Read       | Update     | Delete     |
+| ----------------------- | ---------- | ---------- | ---------- | ---------- |
+| Gruppen                 | ✅         | ✅         | ✅         | ✅         |
+| Kinder                  | ✅         | ✅         | ✅         | ❌ Missing |
+| Erzieher                | ✅         | ✅         | ✅         | ❌ Missing |
+| Dienstplan              | ❌ Missing | ❌ Missing | ❌ Missing | ❌ Missing |
+| Mahlzeiten (Speiseplan) | ❌ Missing | ❌ Missing | ❌ Missing | ❌ Missing |
+| Ankuendigungen          | ❌ Missing | ❌ Missing | ❌ Missing | ❌ Missing |
+
+### Missing Feature Tests
+
+- [ ] Photo upload functionality (`/api/upload` endpoint)
+- [ ] Delete operations for Kinder (children)
+- [ ] Delete operations for Erzieher (teachers)
+
+### Recommended Test Files to Create
 
 ```
-Phase 0 (Dependencies)
-    ├─→ Phase 1 (Database) ─→ Phase 2 (Auth) ─→ All Admin Routes
-    │                      └─→ Phase 8 (Meals)
-    │                      └─→ Phase 9 (Announcements)
-    │
-    └─→ Phase 3 (File Uploads) ─→ Phase 5 (Children)
-                               └─→ Phase 6 (Teachers) ─→ Phase 7 (Schedule)
-
-Phase 4 (Groups) ─→ Phase 5 (Children)
-
-Phases 4-9 (All CRUD) ─→ Phase 10 (Dashboard)
-
-Phase 10 (Dashboard) ─→ Phase 11 (Seed & Tests)
+e2e/
+├── dienstplan.spec.ts      # Schedule CRUD tests
+├── speiseplan.spec.ts      # Meals CRUD tests
+├── ankuendigungen.spec.ts  # Announcements CRUD tests
+└── photo-upload.spec.ts    # Photo upload tests
 ```
 
----
+### Priority
 
-## Recommended Implementation Order
-
-1. **Phase 0** - Install better-auth, bits-ui, configure fonts
-2. **Phase 1** - Define all database tables and relations
-3. **Phase 2** - Set up authentication system
-4. **Phase 3** - File upload infrastructure
-5. **Phase 4** - Groups CRUD (simplest, validates patterns)
-6. **Phase 6** - Teachers CRUD (before children, needed for schedule)
-7. **Phase 5** - Children CRUD (uses groups, photo upload)
-8. **Phase 7** - Schedule management
-9. **Phase 8** - Meal planning
-10. **Phase 9** - Announcements
-11. **Phase 10** - Public dashboard
-12. **Phase 11** - Seed data and E2E tests
+These test gaps should be addressed **before** implementing new features to ensure regression coverage. The deterministic test data from the modular seed system (testing profile) is now available to make these tests more reliable.
 
 ---
 
-## Summary
+## NOTES
 
-| Phase                   | Tasks  | Completed |
-| ----------------------- | ------ | --------- |
-| 0. Dependencies & Setup | 3      | 3         |
-| 1. Database Schema      | 8      | 8         |
-| 2. Authentication       | 6      | 6         |
-| 3. File Uploads         | 3      | 3         |
-| 4. Groups Management    | 4      | 4         |
-| 5. Children Management  | 5      | 5         |
-| 6. Teachers Management  | 4      | 4         |
-| 7. Schedule Management  | 4      | 4         |
-| 8. Meal Planning        | 3      | 3         |
-| 9. Announcements        | 4      | 4         |
-| 10. Public Dashboard    | 8      | 8         |
-| 11. Seed Data & Testing | 4      | 4         |
-| **Total**               | **56** | **56**    |
+### E2E Test Suite
 
----
+- One test is currently disabled: the auto-refresh test in the dashboard suite takes 30+ seconds to complete
+- All 19 active tests are passing and cover authentication, CRUD operations, and dashboard functionality
+- No TODO/FIXME comments exist in the source code (codebase is well organized)
+- **See TEST COVERAGE GAPS section above for missing tests**
 
-## Maintenance Notes
+### Code Quality Observations
 
-### v0.1.1 (2026-01-19)
+- The public dashboard (`src/routes/+page.svelte`) contains inline card components for birthdays, meals, teachers, and announcements
+- **Recommendation**: When implementing the Children Dashboard (Kiosk View), extract these inline components into reusable components in `src/lib/components/dashboard/`
+- This extraction will benefit both the kiosk view and the role-based dashboards (parent/employee)
 
-- Fixed ESLint errors (unused variables, catch blocks)
-- Applied Prettier formatting across all files
-- Updated `eslint.config.js` to disable overly strict Svelte navigation rules
-- Configured Playwright with retries for flaky network tests
-- Updated `AGENTS.md` with correct test commands
-- Created git tag `v0.1.1`
+### German Localization
+
+- All user-facing text is properly localized in German
+- Table names and field names use German conventions (gruppen, kinder, erzieher, etc.)
+- Maintain this convention when adding new features
+
+### Dependency Chain Summary
+
+- Items 3-9 all depend on item 2 (Database Schema for Roles)
+- Items 5-6 additionally depend on item 4 (User Management)
+- Items 7-8 depend on their respective linking features (5 and 6)
+- The two remaining HIGH priority items (1, 2) have no dependencies and can be implemented in any order or in parallel

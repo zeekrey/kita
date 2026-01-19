@@ -23,10 +23,10 @@ test.describe('Public Dashboard', () => {
 		// Check for meals section heading
 		await expect(page.getByText('Speiseplan heute')).toBeVisible();
 
-		// Should show meal types
-		await expect(page.getByText('Frühstück')).toBeVisible();
-		await expect(page.getByText('Mittagessen')).toBeVisible();
-		await expect(page.getByText('Nachmittagssnack')).toBeVisible();
+		// Should show meal types (use exact match to avoid matching descriptions)
+		await expect(page.getByText('Frühstück', { exact: true })).toBeVisible();
+		await expect(page.getByText('Mittagessen', { exact: true })).toBeVisible();
+		await expect(page.getByText('Nachmittagssnack', { exact: true })).toBeVisible();
 	});
 
 	test('should display teachers section', async ({ page }) => {

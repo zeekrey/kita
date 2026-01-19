@@ -6,12 +6,14 @@ import { relations } from 'drizzle-orm';
 // ============================================
 
 // User table for authentication
+// Role values: 'admin' | 'parent' | 'employee'
 export const user = sqliteTable('user', {
 	id: text('id').primaryKey(),
 	name: text('name').notNull(),
 	email: text('email').notNull().unique(),
 	emailVerified: integer('email_verified', { mode: 'boolean' }).default(false),
 	image: text('image'),
+	role: text('role').notNull().default('parent'), // 'admin' | 'parent' | 'employee'
 	createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 	updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 });
@@ -59,10 +61,12 @@ export const verification = sqliteTable('verification', {
 	updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 });
 
-// Better-Auth relations
-export const userRelations = relations(user, ({ many }) => ({
+// Better-Auth relations (extended with role-based tables)
+export const userRelations = relations(user, ({ many, one }) => ({
 	sessions: many(session),
-	accounts: many(account)
+	accounts: many(account),
+	eltern: one(eltern), // One-to-one: user -> parent profile
+	mitarbeiter: one(mitarbeiter) // One-to-one: user -> employee profile
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -162,25 +166,113 @@ export const ankuendigungen = sqliteTable('ankuendigungen', {
 	updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 });
 
+// ============================================
+// Role-Based Tables
+// ============================================
+
+// Parents table - links to user accounts with role='parent'
+export const eltern = sqliteTable('eltern', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	userId: text('user_id')
+		.notNull()
+		.unique()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	telefon: text('telefon'), // Phone number
+	adresse: text('adresse'), // Address
+	createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+	updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+});
+
+// Parent-Child junction table - many-to-many relationship
+// Relationship types: 'mutter' | 'vater' | 'erziehungsberechtigter'
+export const elternKinder = sqliteTable('eltern_kinder', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	elternId: text('eltern_id')
+		.notNull()
+		.references(() => eltern.id, { onDelete: 'cascade' }),
+	kindId: text('kind_id')
+		.notNull()
+		.references(() => kinder.id, { onDelete: 'cascade' }),
+	beziehung: text('beziehung').notNull().default('erziehungsberechtigter'), // 'mutter' | 'vater' | 'erziehungsberechtigter'
+	createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+	updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+});
+
+// Employees table - links to user accounts with role='employee'
+// Can optionally link to an erzieher record for teachers
+export const mitarbeiter = sqliteTable('mitarbeiter', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	userId: text('user_id')
+		.notNull()
+		.unique()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	erzieherId: text('erzieher_id').references(() => erzieher.id), // Optional link to erzieher
+	position: text('position'), // Job title
+	createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+	updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+});
+
 // Drizzle Relations
 export const gruppenRelations = relations(gruppen, ({ many }) => ({
 	kinder: many(kinder)
 }));
 
-export const kinderRelations = relations(kinder, ({ one }) => ({
+export const kinderRelations = relations(kinder, ({ one, many }) => ({
 	gruppe: one(gruppen, {
 		fields: [kinder.gruppeId],
 		references: [gruppen.id]
-	})
+	}),
+	elternKinder: many(elternKinder) // Many-to-many with parents via junction table
 }));
 
-export const erzieherRelations = relations(erzieher, ({ many }) => ({
-	dienstplan: many(dienstplan)
+export const erzieherRelations = relations(erzieher, ({ many, one }) => ({
+	dienstplan: many(dienstplan),
+	mitarbeiter: one(mitarbeiter) // Optional link to employee profile
 }));
 
 export const dienstplanRelations = relations(dienstplan, ({ one }) => ({
 	erzieher: one(erzieher, {
 		fields: [dienstplan.erzieherId],
+		references: [erzieher.id]
+	})
+}));
+
+// ============================================
+// Role-Based Relations
+// ============================================
+
+export const elternRelations = relations(eltern, ({ one, many }) => ({
+	user: one(user, {
+		fields: [eltern.userId],
+		references: [user.id]
+	}),
+	elternKinder: many(elternKinder) // Many-to-many with children via junction table
+}));
+
+export const elternKinderRelations = relations(elternKinder, ({ one }) => ({
+	eltern: one(eltern, {
+		fields: [elternKinder.elternId],
+		references: [eltern.id]
+	}),
+	kind: one(kinder, {
+		fields: [elternKinder.kindId],
+		references: [kinder.id]
+	})
+}));
+
+export const mitarbeiterRelations = relations(mitarbeiter, ({ one }) => ({
+	user: one(user, {
+		fields: [mitarbeiter.userId],
+		references: [user.id]
+	}),
+	erzieher: one(erzieher, {
+		fields: [mitarbeiter.erzieherId],
 		references: [erzieher.id]
 	})
 }));

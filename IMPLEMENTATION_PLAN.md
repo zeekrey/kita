@@ -1,7 +1,7 @@
 # Kita v2.0 Implementation Plan
 
 > **Last Updated:** 2026-01-19
-> **Status:** Phase 1 complete. Ready for Phase 2 (HIGH priority items).
+> **Status:** Phase 1 complete. HIGH priority items complete. Ready for Phase 2 (MEDIUM priority items).
 
 ## Overview
 
@@ -96,61 +96,45 @@ This document tracks the implementation status and priority of all features for 
     - Announcements display
     - Auto-refresh functionality
 
----
-
-## HIGH PRIORITY (Implement Next)
-
-These items have no external dependencies and provide immediate value:
-
-### 1. Database Schema for Roles
-
-**Why high priority**: Foundation for all role-based features. No external dependencies.
-
-- [ ] **Add role column to user table** (`src/lib/server/db/schema.js`)
-
-  ```javascript
-  role: text('role').notNull().default('parent'); // 'admin' | 'parent' | 'employee'
-  ```
-
-- [ ] **Create eltern (parents) table** (`src/lib/server/db/schema.js`)
-  - `id` (primary key)
-  - `userId` (FK to user)
-  - `telefon` (phone)
-  - `adresse` (address)
-  - `createdAt`, `updatedAt` timestamps
-
-- [ ] **Create eltern_kinder junction table** (`src/lib/server/db/schema.js`)
-  - `id` (primary key)
-  - `elternId` (FK to eltern)
-  - `kindId` (FK to kinder)
-  - `beziehung` ('mutter' | 'vater' | 'erziehungsberechtigter')
-
-- [ ] **Create mitarbeiter (employees) table** (`src/lib/server/db/schema.js`)
-  - `id` (primary key)
-  - `userId` (FK to user)
-  - `erzieherId` (FK to erzieher, optional)
-  - `position` (job title)
-  - `createdAt`, `updatedAt` timestamps
-
-- [ ] **Add Drizzle relations for new tables**
-  - User -> eltern (one-to-one)
-  - User -> mitarbeiter (one-to-one)
-  - eltern <-> kinder (many-to-many via junction)
-  - mitarbeiter -> erzieher (one-to-one optional)
-
-- [ ] **Run migration**
-  - `npm run db:push` or `npm run db:migrate`
-  - Handle existing users: set role to 'admin'
+- [x] **Database Schema for Roles** (`src/lib/server/db/schema.js`)
+  - Added `role` column to `user` table with type: `'admin' | 'parent' | 'employee'`, default: `'parent'`
+  - Created `eltern` (parents) table with:
+    - `id` (primary key)
+    - `userId` (FK to user)
+    - `telefon` (phone)
+    - `adresse` (address)
+    - `createdAt`, `updatedAt` timestamps
+  - Created `eltern_kinder` junction table for parent-child relationships with:
+    - `id` (primary key)
+    - `elternId` (FK to eltern)
+    - `kindId` (FK to kinder)
+    - `beziehung` (relationship type: 'mutter' | 'vater' | 'erziehungsberechtigter')
+  - Created `mitarbeiter` (employees) table with:
+    - `id` (primary key)
+    - `userId` (FK to user)
+    - `erzieherId` (FK to erzieher, optional)
+    - `position` (job title)
+    - `createdAt`, `updatedAt` timestamps
+  - Added all Drizzle relations for the new tables:
+    - User -> eltern (one-to-one)
+    - User -> mitarbeiter (one-to-one)
+    - eltern <-> kinder (many-to-many via eltern_kinder junction)
+    - mitarbeiter -> erzieher (one-to-one optional)
+  - Ran `npm run db:push` migration successfully
+  - **Migration Note**: Existing users default to 'parent' role. To set admin users, run manual SQL update:
+    ```sql
+    UPDATE user SET role='admin' WHERE email='admin@example.com';
+    ```
 
 ---
 
 ## MEDIUM PRIORITY
 
-These items build on HIGH priority work or have soft dependencies:
+These items build on completed HIGH priority work or have soft dependencies:
 
-### 2. Role-Based Route Protection
+### 1. Role-Based Route Protection
 
-**Depends on**: Schema for Roles (HIGH #1)
+**Depends on**: Schema for Roles (COMPLETED)
 
 - [ ] **Create auth utility for role checking** (`src/lib/server/auth-utils.js`)
 
@@ -166,9 +150,9 @@ These items build on HIGH priority work or have soft dependencies:
 - [ ] **Add role to session data** (`src/lib/server/auth.js`)
   - Include role in session user object
 
-### 3. Admin User Management
+### 2. Admin User Management
 
-**Depends on**: Schema for Roles (HIGH #1)
+**Depends on**: Schema for Roles (COMPLETED)
 
 - [ ] **User management page** (`src/routes/admin/benutzer/+page.svelte`)
   - List all users with roles
@@ -178,9 +162,9 @@ These items build on HIGH priority work or have soft dependencies:
 - [ ] **User management API routes**
   - `src/routes/admin/benutzer/+page.server.js` - CRUD operations
 
-### 4. Admin Parent-Child Linking
+### 3. Admin Parent-Child Linking
 
-**Depends on**: Schema for Roles (HIGH #1), User Management (MEDIUM #3)
+**Depends on**: Schema for Roles (COMPLETED), User Management (MEDIUM #2)
 
 - [ ] **Parent management page** (`src/routes/admin/eltern/+page.svelte`)
   - List all parents
@@ -191,9 +175,9 @@ These items build on HIGH priority work or have soft dependencies:
 - [ ] **Parent management API routes**
   - `src/routes/admin/eltern/+page.server.js`
 
-### 5. Admin Employee-Teacher Linking
+### 4. Admin Employee-Teacher Linking
 
-**Depends on**: Schema for Roles (HIGH #1), User Management (MEDIUM #3)
+**Depends on**: Schema for Roles (COMPLETED), User Management (MEDIUM #2)
 
 - [ ] **Employee management page** (`src/routes/admin/mitarbeiter/+page.svelte`)
   - List all employees
@@ -203,9 +187,9 @@ These items build on HIGH priority work or have soft dependencies:
 - [ ] **Employee management API routes**
   - `src/routes/admin/mitarbeiter/+page.server.js`
 
-### 6. Parent Dashboard
+### 5. Parent Dashboard
 
-**Depends on**: Schema for Roles (HIGH #1), Role Protection (MEDIUM #2), Parent-Child Linking (MEDIUM #4)
+**Depends on**: Schema for Roles (COMPLETED), Role Protection (MEDIUM #1), Parent-Child Linking (MEDIUM #3)
 
 - [ ] **Parent layout with auth guard** (`src/routes/eltern/+layout.server.js`)
   - Require role: 'parent'
@@ -227,9 +211,9 @@ These items build on HIGH priority work or have soft dependencies:
   - View active announcements
   - Read-only
 
-### 7. Employee Dashboard
+### 6. Employee Dashboard
 
-**Depends on**: Schema for Roles (HIGH #1), Role Protection (MEDIUM #2), Employee-Teacher Linking (MEDIUM #5)
+**Depends on**: Schema for Roles (COMPLETED), Role Protection (MEDIUM #1), Employee-Teacher Linking (MEDIUM #4)
 
 - [ ] **Employee layout with auth guard** (`src/routes/mitarbeiter/+layout.server.js`)
   - Require role: 'employee'
@@ -248,9 +232,9 @@ These items build on HIGH priority work or have soft dependencies:
   - Children in their assigned groups
   - Group details
 
-### 8. Shared Dashboard Components
+### 7. Shared Dashboard Components
 
-**Depends on**: Children Dashboard (COMPLETED), Parent Dashboard (MEDIUM #6)
+**Depends on**: Children Dashboard (COMPLETED), Parent Dashboard (MEDIUM #5)
 
 - [ ] **Create dashboard components directory** (`src/lib/components/dashboard/`)
 
@@ -280,9 +264,9 @@ These items build on HIGH priority work or have soft dependencies:
 
 These items require external dependencies (API credentials) or are nice-to-have:
 
-### 9. Self-Registration Page
+### 8. Self-Registration Page
 
-**Depends on**: Schema for Roles (HIGH #1)
+**Depends on**: Schema for Roles (COMPLETED)
 **Note**: Can implement email/password registration without social login
 
 - [ ] **Registration page** (`src/routes/registrieren/+page.svelte`)
@@ -295,7 +279,7 @@ These items require external dependencies (API credentials) or are nice-to-have:
   - Create empty eltern record
   - Send verification email (if configured)
 
-### 10. Google OAuth Integration
+### 9. Google OAuth Integration
 
 **Requires**: Google Cloud Console credentials (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
 
@@ -319,7 +303,7 @@ These items require external dependencies (API credentials) or are nice-to-have:
 
 - [ ] **Add Google sign-in button** to login and registration pages
 
-### 11. Apple Sign-In Integration
+### 10. Apple Sign-In Integration
 
 **Requires**: Apple Developer credentials (APPLE_CLIENT_ID, APPLE_CLIENT_SECRET, APPLE_TEAM_ID, APPLE_KEY_ID)
 **Note**: Requires HTTPS for callback (use ngrok for local dev)
@@ -348,16 +332,16 @@ These items require external dependencies (API credentials) or are nice-to-have:
 
 - [ ] **Add Apple sign-in button** to login and registration pages
 
-### 12. Social Login on Admin Login Page
+### 11. Social Login on Admin Login Page
 
-**Depends on**: Google OAuth (LOW #10) and/or Apple Sign-In (LOW #11)
+**Depends on**: Google OAuth (LOW #9) and/or Apple Sign-In (LOW #10)
 
 - [ ] **Update admin login page** (`src/routes/admin/login/+page.svelte`)
   - Add "Sign in with Google" button
   - Add "Sign in with Apple" button
   - Keep email/password as primary option
 
-### 13. Attendance Tracking (Future Version)
+### 12. Attendance Tracking (Future Version)
 
 **Status**: Explicitly deferred per implementation plan
 
@@ -369,34 +353,37 @@ These items require external dependencies (API credentials) or are nice-to-have:
 
 ## Implementation Order Summary
 
-| Order | Item                           | Priority  | Dependencies | External Deps      |
-| ----- | ------------------------------ | --------- | ------------ | ------------------ |
-| ~~1~~ | ~~Modular Seed System~~        | COMPLETED | None         | None               |
-| ~~2~~ | ~~Children Dashboard (Kiosk)~~ | COMPLETED | None         | None               |
-| 1     | Database Schema for Roles      | HIGH      | None         | None               |
-| 2     | Role-Based Route Protection    | MEDIUM    | #1           | None               |
-| 3     | Admin User Management          | MEDIUM    | #1           | None               |
-| 4     | Admin Parent-Child Linking     | MEDIUM    | #1, #3       | None               |
-| 5     | Admin Employee-Teacher Linking | MEDIUM    | #1, #3       | None               |
-| 6     | Parent Dashboard               | MEDIUM    | #1, #2, #4   | None               |
-| 7     | Employee Dashboard             | MEDIUM    | #1, #2, #5   | None               |
-| 8     | Shared Dashboard Components    | MEDIUM    | (Kiosk), #6  | None               |
-| 9     | Self-Registration Page         | LOW       | #1           | None               |
-| 10    | Google OAuth                   | LOW       | #1           | Google credentials |
-| 11    | Apple Sign-In                  | LOW       | #1           | Apple credentials  |
-| 12    | Social Login Buttons           | LOW       | #10, #11     | OAuth credentials  |
-| 13    | Attendance Tracking            | DEFERRED  | Many         | None               |
+| Order | Item                           | Priority  | Dependencies         | External Deps      |
+| ----- | ------------------------------ | --------- | -------------------- | ------------------ |
+| ~~1~~ | ~~Modular Seed System~~        | COMPLETED | None                 | None               |
+| ~~2~~ | ~~Children Dashboard (Kiosk)~~ | COMPLETED | None                 | None               |
+| ~~3~~ | ~~Database Schema for Roles~~  | COMPLETED | None                 | None               |
+| 1     | Role-Based Route Protection    | MEDIUM    | Roles Schema         | None               |
+| 2     | Admin User Management          | MEDIUM    | Roles Schema         | None               |
+| 3     | Admin Parent-Child Linking     | MEDIUM    | Roles Schema, #2     | None               |
+| 4     | Admin Employee-Teacher Linking | MEDIUM    | Roles Schema, #2     | None               |
+| 5     | Parent Dashboard               | MEDIUM    | Roles Schema, #1, #3 | None               |
+| 6     | Employee Dashboard             | MEDIUM    | Roles Schema, #1, #4 | None               |
+| 7     | Shared Dashboard Components    | MEDIUM    | Kiosk, #5            | None               |
+| 8     | Self-Registration Page         | LOW       | Roles Schema         | None               |
+| 9     | Google OAuth                   | LOW       | Roles Schema         | Google credentials |
+| 10    | Apple Sign-In                  | LOW       | Roles Schema         | Apple credentials  |
+| 11    | Social Login Buttons           | LOW       | #9, #10              | OAuth credentials  |
+| 12    | Attendance Tracking            | DEFERRED  | Many                 | None               |
 
 ---
 
 ## Verification Checklist
 
-### After Role Schema
+### Database Schema for Roles (COMPLETED)
 
-```bash
-npm run db:push                                     # Apply schema changes
-# Verify existing users have role='admin'
-```
+- ✓ Schema changes applied with `npm run db:push`
+- ✓ Role column added to user table
+- ✓ Eltern (parents) table created
+- ✓ Eltern_kinder junction table created
+- ✓ Mitarbeiter (employees) table created
+- ✓ All Drizzle relations configured
+- Note: Existing users default to 'parent' role - update admin users manually
 
 ### Children Dashboard (COMPLETED)
 

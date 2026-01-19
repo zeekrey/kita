@@ -299,9 +299,25 @@ export const SHIFT_PRESETS = {
  * Clear all application data from the database (respects foreign key constraints)
  * @param {import('drizzle-orm/better-sqlite3').BetterSQLite3Database} db
  * @param {typeof import('../../src/lib/server/db/schema.js')} schema
+ * @param {object} [options]
+ * @param {boolean} [options.clearAuthTables=false] - Also clear user/account/session tables
  */
-export function clearData(db, schema) {
+export function clearData(db, schema, options = {}) {
 	console.log('🗑️  Clearing existing data...');
+
+	// Clear auth tables if requested (for testing profile)
+	if (options.clearAuthTables) {
+		console.log('   🔐 Clearing auth tables...');
+		db.delete(schema.elternKinder).run();
+		db.delete(schema.eltern).run();
+		db.delete(schema.mitarbeiter).run();
+		db.delete(schema.session).run();
+		db.delete(schema.account).run();
+		db.delete(schema.verification).run();
+		db.delete(schema.user).run();
+	}
+
+	// Clear application tables
 	db.delete(schema.dienstplan).run();
 	db.delete(schema.mahlzeiten).run();
 	db.delete(schema.ankuendigungen).run();

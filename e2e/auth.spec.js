@@ -1,5 +1,25 @@
 import { test, expect } from '@playwright/test';
 
+/**
+ * Helper function to create an admin user for testing.
+ * Signs up a new user and sets their role to 'admin'.
+ * @param {import('@playwright/test').APIRequestContext} request
+ * @param {string} email
+ * @param {string} password
+ * @param {string} name
+ */
+async function createAdminUser(request, email, password = 'password123', name = 'Admin User') {
+	// Sign up the user
+	await request.post('/api/auth/sign-up/email', {
+		data: { email, password, name }
+	});
+
+	// Set the user's role to admin (test-only endpoint)
+	await request.post('/api/test/set-role', {
+		data: { email, role: 'admin' }
+	});
+}
+
 test.describe('Authentication', () => {
 	test('should show login page for unauthenticated users', async ({ page }) => {
 		await page.goto('/admin');
@@ -18,15 +38,9 @@ test.describe('Authentication', () => {
 	});
 
 	test('should login successfully with valid credentials', async ({ page, request }) => {
-		// Sign up a new user via separate API context (not tied to page)
+		// Create an admin user for testing
 		const uniqueEmail = `admin-login-${Date.now()}@kita.de`;
-		await request.post('/api/auth/sign-up/email', {
-			data: {
-				email: uniqueEmail,
-				password: 'password123',
-				name: 'Admin User'
-			}
-		});
+		await createAdminUser(request, uniqueEmail);
 
 		// Navigate to login page
 		await page.goto('/admin/login', { waitUntil: 'domcontentloaded' });
@@ -39,27 +53,19 @@ test.describe('Authentication', () => {
 		await page.fill('input[type="password"]', 'password123');
 		await page.click('button[type="submit"]');
 
-		// Wait for navigation - the successful login should either:
-		// 1. Navigate to /admin (without login suffix)
-		// 2. Show the sidebar with "Kita Admin" heading
+		// Wait for navigation - admin users should be redirected to /admin
 		await expect(async () => {
 			const url = page.url();
-			const notOnLogin = !url.includes('/admin/login');
+			const onAdminPage = url.includes('/admin') && !url.includes('/admin/login');
 			const hasSidebar = await page.getByRole('heading', { name: 'Kita Admin' }).isVisible();
-			expect(notOnLogin || hasSidebar).toBeTruthy();
+			expect(onAdminPage || hasSidebar).toBeTruthy();
 		}).toPass({ timeout: 10000 });
 	});
 
 	test('should logout successfully', async ({ page, request }) => {
-		// Sign up a new user via separate API context
+		// Create an admin user for testing
 		const uniqueEmail = `admin-logout-${Date.now()}@kita.de`;
-		await request.post('/api/auth/sign-up/email', {
-			data: {
-				email: uniqueEmail,
-				password: 'password123',
-				name: 'Admin User'
-			}
-		});
+		await createAdminUser(request, uniqueEmail);
 
 		// Navigate to login page
 		await page.goto('/admin/login', { waitUntil: 'domcontentloaded' });

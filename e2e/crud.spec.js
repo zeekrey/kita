@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Helper to login before tests
+ * Helper to create an admin user and login for tests
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').APIRequestContext} request
  * @param {string} emailPrefix
@@ -10,13 +10,18 @@ async function login(page, request, emailPrefix) {
 	// Generate unique email for each test run
 	const uniqueEmail = `${emailPrefix}-${Date.now()}@kita.de`;
 
-	// Ensure user exists via separate API context
+	// Create user via sign-up
 	await request.post('/api/auth/sign-up/email', {
 		data: {
 			email: uniqueEmail,
 			password: 'password123',
 			name: 'Test User'
 		}
+	});
+
+	// Set the user's role to admin (test-only endpoint)
+	await request.post('/api/test/set-role', {
+		data: { email: uniqueEmail, role: 'admin' }
 	});
 
 	// Navigate to login page and wait for it to fully load

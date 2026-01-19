@@ -1,7 +1,7 @@
 # Kita v2.0 Implementation Plan
 
 > **Last Updated:** 2026-01-19
-> **Status:** Phase 1 complete. HIGH priority items complete. Ready for Phase 2 (MEDIUM priority items).
+> **Status:** Phase 1 complete. Role-Based Route Protection (MEDIUM #1) complete. Ready for Admin User Management (MEDIUM #2).
 
 ## Overview
 
@@ -132,23 +132,33 @@ This document tracks the implementation status and priority of all features for 
 
 These items build on completed HIGH priority work or have soft dependencies:
 
-### 1. Role-Based Route Protection
+### 1. Role-Based Route Protection (COMPLETED)
 
 **Depends on**: Schema for Roles (COMPLETED)
 
-- [ ] **Create auth utility for role checking** (`src/lib/server/auth-utils.js`)
+- [x] **Create auth utility for role checking** (`src/lib/server/auth-utils.js`)
+  - `requireRole(session, allowedRoles)` - Check if user has required role, throw redirect if not
+  - `getDashboardForRole(role)` - Get dashboard URL for a given role
+  - `hasRole(session, role)` - Check if user has a specific role
+  - `hasAnyRole(session, roles)` - Check if user has any of the specified roles
 
-  ```javascript
-  export function requireRole(session, allowedRoles) { ... }
-  export function getDashboardForRole(role) { ... }
-  ```
+- [x] **Update admin layout guard** (`src/routes/admin/+layout.server.js`)
+  - Check for 'admin' role using `requireRole(session, ['admin'])`
+  - Redirect non-admins to appropriate dashboard using `getDashboardForRole()`
+  - Authenticated non-admin users visiting `/admin/login` are redirected to their dashboard
 
-- [ ] **Update admin layout guard** (`src/routes/admin/+layout.server.js`)
-  - Check for 'admin' role
-  - Redirect non-admins to appropriate dashboard
+- [x] **Add role to session data** (`src/lib/server/auth.js`)
+  - Configured Better-Auth `user.additionalFields.role` to include role in session
+  - Role field has `input: false` to prevent users from setting their own role on signup
 
-- [ ] **Add role to session data** (`src/lib/server/auth.js`)
-  - Include role in session user object
+- [x] **Test-only API endpoint** (`src/routes/api/test/set-role/+server.js`)
+  - Development-only endpoint to set user roles for E2E testing
+  - Allows tests to create admin users for testing admin functionality
+
+- [x] **Updated E2E tests** (`e2e/auth.spec.js`, `e2e/crud.spec.js`)
+  - Tests now use `createAdminUser()` helper to create admin users
+  - Calls `/api/test/set-role` after signup to set role to 'admin'
+  - All 29 tests passing
 
 ### 2. Admin User Management
 
@@ -353,23 +363,23 @@ These items require external dependencies (API credentials) or are nice-to-have:
 
 ## Implementation Order Summary
 
-| Order | Item                           | Priority  | Dependencies         | External Deps      |
-| ----- | ------------------------------ | --------- | -------------------- | ------------------ |
-| ~~1~~ | ~~Modular Seed System~~        | COMPLETED | None                 | None               |
-| ~~2~~ | ~~Children Dashboard (Kiosk)~~ | COMPLETED | None                 | None               |
-| ~~3~~ | ~~Database Schema for Roles~~  | COMPLETED | None                 | None               |
-| 1     | Role-Based Route Protection    | MEDIUM    | Roles Schema         | None               |
-| 2     | Admin User Management          | MEDIUM    | Roles Schema         | None               |
-| 3     | Admin Parent-Child Linking     | MEDIUM    | Roles Schema, #2     | None               |
-| 4     | Admin Employee-Teacher Linking | MEDIUM    | Roles Schema, #2     | None               |
-| 5     | Parent Dashboard               | MEDIUM    | Roles Schema, #1, #3 | None               |
-| 6     | Employee Dashboard             | MEDIUM    | Roles Schema, #1, #4 | None               |
-| 7     | Shared Dashboard Components    | MEDIUM    | Kiosk, #5            | None               |
-| 8     | Self-Registration Page         | LOW       | Roles Schema         | None               |
-| 9     | Google OAuth                   | LOW       | Roles Schema         | Google credentials |
-| 10    | Apple Sign-In                  | LOW       | Roles Schema         | Apple credentials  |
-| 11    | Social Login Buttons           | LOW       | #9, #10              | OAuth credentials  |
-| 12    | Attendance Tracking            | DEFERRED  | Many                 | None               |
+| Order | Item                            | Priority  | Dependencies         | External Deps      |
+| ----- | ------------------------------- | --------- | -------------------- | ------------------ |
+| ~~1~~ | ~~Modular Seed System~~         | COMPLETED | None                 | None               |
+| ~~2~~ | ~~Children Dashboard (Kiosk)~~  | COMPLETED | None                 | None               |
+| ~~3~~ | ~~Database Schema for Roles~~   | COMPLETED | None                 | None               |
+| ~~4~~ | ~~Role-Based Route Protection~~ | COMPLETED | Roles Schema         | None               |
+| 1     | Admin User Management           | MEDIUM    | Roles Schema         | None               |
+| 3     | Admin Parent-Child Linking      | MEDIUM    | Roles Schema, #2     | None               |
+| 4     | Admin Employee-Teacher Linking  | MEDIUM    | Roles Schema, #2     | None               |
+| 5     | Parent Dashboard                | MEDIUM    | Roles Schema, #1, #3 | None               |
+| 6     | Employee Dashboard              | MEDIUM    | Roles Schema, #1, #4 | None               |
+| 7     | Shared Dashboard Components     | MEDIUM    | Kiosk, #5            | None               |
+| 8     | Self-Registration Page          | LOW       | Roles Schema         | None               |
+| 9     | Google OAuth                    | LOW       | Roles Schema         | Google credentials |
+| 10    | Apple Sign-In                   | LOW       | Roles Schema         | Apple credentials  |
+| 11    | Social Login Buttons            | LOW       | #9, #10              | OAuth credentials  |
+| 12    | Attendance Tracking             | DEFERRED  | Many                 | None               |
 
 ---
 
@@ -391,6 +401,20 @@ These items require external dependencies (API credentials) or are nice-to-have:
 - Verify playful design, large touch targets
 - Test on tablet/TV resolution
 - Run E2E tests: `npm run test:e2e -- kiosk.spec.ts`
+
+### Role-Based Route Protection (COMPLETED)
+
+- ✓ Auth utilities created at `src/lib/server/auth-utils.js`
+- ✓ Better-Auth configured to include role in session (`src/lib/server/auth.js`)
+- ✓ Admin layout guard checks for 'admin' role (`src/routes/admin/+layout.server.js`)
+- ✓ Test-only endpoint for setting roles (`src/routes/api/test/set-role/+server.js`)
+- ✓ E2E tests updated to create admin users
+- ✓ All 29 E2E tests passing
+- Verification:
+  - Admin users logging in -> redirected to `/admin`
+  - Non-admin users accessing `/admin/*` -> redirected to their role's dashboard
+  - Parent dashboard at `/eltern` (not yet implemented)
+  - Employee dashboard at `/mitarbeiter` (not yet implemented)
 
 ### After Role-Based Dashboards
 
@@ -463,11 +487,13 @@ These test gaps should be addressed **before** implementing new features to ensu
 ### E2E Test Suite
 
 - One test is currently disabled: the auto-refresh test in the dashboard suite takes 30+ seconds to complete
-- All 25 active tests are passing and cover:
-  - Authentication flows
-  - CRUD operations for groups, children, and teachers
-  - Public dashboard functionality
+- All 29 active tests are passing and cover:
+  - Authentication flows (4 tests) - now with role-based auth
+  - CRUD operations for groups, children, and teachers (11 tests)
+  - Public dashboard functionality (10 tests)
   - Kiosk view functionality (6 tests)
+- Tests use `createAdminUser()` helper to create admin users with proper role
+- Test-only endpoint `/api/test/set-role` allows setting user roles (dev mode only)
 - No TODO/FIXME comments exist in the source code (codebase is well organized)
 - **See TEST COVERAGE GAPS section above for missing tests**
 

@@ -10,5 +10,15 @@ export const auth = betterAuth({
 	}),
 	emailAndPassword: {
 		enabled: true
+	},
+	user: {
+		additionalFields: {
+			role: {
+				type: 'string',
+				required: false,
+				defaultValue: 'parent',
+				input: false // Don't allow users to set their own role on signup
+			}
+		}
 	}
 });

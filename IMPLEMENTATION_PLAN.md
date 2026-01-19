@@ -1,7 +1,7 @@
 # Kita v2.0 Implementation Plan
 
 > **Last Updated:** 2026-01-19
-> **Status:** Phase 1 complete. Role-Based Route Protection (MEDIUM #1) complete. Admin User Management (MEDIUM #2) complete. Ready for Admin Parent-Child Linking (MEDIUM #3).
+> **Status:** Phase 1 complete. Role-Based Route Protection (MEDIUM #1) complete. Admin User Management (MEDIUM #2) complete. Admin Parent-Child Linking (MEDIUM #3) complete. Ready for Admin Employee-Teacher Linking (MEDIUM #4).
 
 ## Overview
 
@@ -186,18 +186,27 @@ These items build on completed HIGH priority work or have soft dependencies:
     - Protection against deleting last admin
     - Navigation from admin layout
 
-### 3. Admin Parent-Child Linking
+### 3. Admin Parent-Child Linking (COMPLETED)
 
 **Depends on**: Schema for Roles (COMPLETED), User Management (MEDIUM #2)
 
-- [ ] **Parent management page** (`src/routes/admin/eltern/+page.svelte`)
-  - List all parents
-  - Link parents to children (multi-select)
-  - Set relationship type (mother/father/guardian)
-  - View parent's linked children
+- [x] **Parent management page** (`src/routes/admin/eltern/+page.svelte`)
+  - List all parents with card-based UI
+  - Search by name, email, phone, or child name
+  - Edit parent profile (phone, address)
+  - Link parents to children with relationship type (mutter/vater/erziehungsberechtigter)
+  - Unlink children from parents with confirmation modal
+  - View parent's linked children with group color indicators
+  - Counter showing filtered/total parents
 
-- [ ] **Parent management API routes**
-  - `src/routes/admin/eltern/+page.server.js`
+- [x] **Parent management API routes** (`src/routes/admin/eltern/+page.server.js`)
+  - Load action: Fetch all parent users with eltern profiles and linked children
+  - `updateProfile` action: Update parent phone and address
+  - `linkChild` action: Link a child to parent with relationship type
+  - `unlinkChild` action: Remove parent-child link
+  - 7 E2E tests added in `e2e/eltern.spec.js`
+
+- [x] **Navigation link** added to admin layout sidebar
 
 ### 4. Admin Employee-Teacher Linking
 
@@ -384,7 +393,7 @@ These items require external dependencies (API credentials) or are nice-to-have:
 | ~~3~~ | ~~Database Schema for Roles~~   | COMPLETED | None                 | None               |
 | ~~4~~ | ~~Role-Based Route Protection~~ | COMPLETED | Roles Schema         | None               |
 | ~~5~~ | ~~Admin User Management~~       | COMPLETED | Roles Schema         | None               |
-| 3     | Admin Parent-Child Linking      | MEDIUM    | Roles Schema, #2     | None               |
+| ~~6~~ | ~~Admin Parent-Child Linking~~  | COMPLETED | Roles Schema, #2     | None               |
 | 4     | Admin Employee-Teacher Linking  | MEDIUM    | Roles Schema, #2     | None               |
 | 5     | Parent Dashboard                | MEDIUM    | Roles Schema, #1, #3 | None               |
 | 6     | Employee Dashboard              | MEDIUM    | Roles Schema, #1, #4 | None               |
@@ -451,6 +460,29 @@ These items require external dependencies (API credentials) or are nice-to-have:
   - Test deleting a user (should show confirmation modal)
   - Verify cannot delete last admin user
   - Run E2E tests: `npm run test:e2e -- benutzer.spec.js`
+
+### Admin Parent-Child Linking (COMPLETED)
+
+- ✓ Parent management page implemented at `/admin/eltern`
+- ✓ Card-based UI displaying all parent users
+- ✓ Search functionality by name, email, phone, or child name
+- ✓ Edit parent profile modal (phone, address)
+- ✓ Link child modal with relationship type selection
+- ✓ Unlink child with confirmation modal
+- ✓ Linked children display with group color indicators and relationship badges
+- ✓ Counter showing filtered/total parents
+- ✓ Navigation link added to admin layout sidebar
+- ✓ API routes with `updateProfile`, `linkChild`, and `unlinkChild` actions
+- ✓ Test endpoint updated to create eltern records when setting role to parent
+- ✓ 7 E2E tests passing in `e2e/eltern.spec.js`
+- Verification:
+  - Visit `/admin/eltern` as admin user
+  - Verify parent list displays with contact info and linked children
+  - Test search by name, email, phone, or child name
+  - Test editing a parent's profile (phone, address)
+  - Test linking a child to a parent with relationship type
+  - Test unlinking a child (should show confirmation modal)
+  - Run E2E tests: `npm run test:e2e -- eltern.spec.js`
 
 ### After Role-Based Dashboards
 
@@ -523,12 +555,13 @@ These test gaps should be addressed **before** implementing new features to ensu
 ### E2E Test Suite
 
 - One test is currently disabled: the auto-refresh test in the dashboard suite takes 30+ seconds to complete
-- All 38 active tests are passing and cover:
+- All 45 active tests are passing and cover:
   - Authentication flows (4 tests) - now with role-based auth
   - CRUD operations for groups, children, and teachers (11 tests)
   - Public dashboard functionality (10 tests)
   - Kiosk view functionality (6 tests)
-  - Admin user management (9 tests) - new in `e2e/benutzer.spec.js`
+  - Admin user management (9 tests) in `e2e/benutzer.spec.js`
+  - Admin parent management (7 tests) in `e2e/eltern.spec.js`
 - Tests use `createAdminUser()` helper to create admin users with proper role
 - Test-only endpoint `/api/test/set-role` allows setting user roles (dev mode only)
 - No TODO/FIXME comments exist in the source code (codebase is well organized)

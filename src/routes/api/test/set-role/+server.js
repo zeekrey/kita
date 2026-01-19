@@ -9,7 +9,7 @@
 import { json } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import { db } from '$lib/server/db';
-import { user } from '$lib/server/db/schema';
+import { user, eltern, mitarbeiter } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 const VALID_ROLES = ['admin', 'parent', 'employee'];
@@ -44,6 +44,31 @@ export async function POST({ request }) {
 
 		if (result.length === 0) {
 			return json({ error: 'User not found' }, { status: 404 });
+		}
+
+		const userId = result[0].id;
+
+		// Create associated profile record based on role
+		if (role === 'parent') {
+			// Check if eltern record already exists
+			const existingEltern = await db
+				.select()
+				.from(eltern)
+				.where(eq(eltern.userId, userId))
+				.limit(1);
+			if (existingEltern.length === 0) {
+				await db.insert(eltern).values({ userId });
+			}
+		} else if (role === 'employee') {
+			// Check if mitarbeiter record already exists
+			const existingMitarbeiter = await db
+				.select()
+				.from(mitarbeiter)
+				.where(eq(mitarbeiter.userId, userId))
+				.limit(1);
+			if (existingMitarbeiter.length === 0) {
+				await db.insert(mitarbeiter).values({ userId });
+			}
 		}
 
 		return json({ success: true, user: result[0] });

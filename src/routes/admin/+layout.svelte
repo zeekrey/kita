@@ -13,7 +13,8 @@
 		{ href: '/admin/dienstplan', label: 'Dienstplan', icon: '📅' },
 		{ href: '/admin/speiseplan', label: 'Speiseplan', icon: '🍽️' },
 		{ href: '/admin/ankuendigungen', label: 'Ankündigungen', icon: '📢' },
-		{ href: '/admin/benutzer', label: 'Benutzer', icon: '👤' }
+		{ href: '/admin/benutzer', label: 'Benutzer', icon: '👤' },
+		{ href: '/admin/eltern', label: 'Eltern', icon: '👨‍👩‍👧' }
 	];
 
 	async function handleLogout() {

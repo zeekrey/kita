@@ -1,5 +1,12 @@
 import { db } from '$lib/server/db';
-import { kinder, gruppen, erzieher, dienstplan, mahlzeiten, ankuendigungen } from '$lib/server/db/schema.js';
+import {
+	kinder,
+	gruppen,
+	erzieher,
+	dienstplan,
+	mahlzeiten,
+	ankuendigungen
+} from '$lib/server/db/schema.js';
 import { eq, and, lte, gte, desc } from 'drizzle-orm';
 import { formatDate } from '$lib/utils/date.js';
 
@@ -27,7 +34,7 @@ export async function load() {
 		.from(kinder)
 		.leftJoin(gruppen, eq(kinder.gruppeId, gruppen.id));
 
-	const birthdayChildren = allChildren.filter(child => {
+	const birthdayChildren = allChildren.filter((child) => {
 		if (!child.geburtstag) return false;
 		const childMonthDay = child.geburtstag.slice(5);
 		return childMonthDay === todayMonthDay;
@@ -48,26 +55,18 @@ export async function load() {
 		.innerJoin(erzieher, eq(dienstplan.erzieherId, erzieher.id))
 		.where(eq(dienstplan.datum, today));
 
-	const teachersOnDuty = allSchedules.filter(schedule => {
+	const teachersOnDuty = allSchedules.filter((schedule) => {
 		return schedule.startZeit <= currentTime && schedule.endZeit >= currentTime;
 	});
 
 	// Get today's meals
-	const meals = await db
-		.select()
-		.from(mahlzeiten)
-		.where(eq(mahlzeiten.datum, today));
+	const meals = await db.select().from(mahlzeiten).where(eq(mahlzeiten.datum, today));
 
 	// Get active announcements (sorted by priority)
 	const announcements = await db
 		.select()
 		.from(ankuendigungen)
-		.where(
-			and(
-				lte(ankuendigungen.gueltigVon, today),
-				gte(ankuendigungen.gueltigBis, today)
-			)
-		)
+		.where(and(lte(ankuendigungen.gueltigVon, today), gte(ankuendigungen.gueltigBis, today)))
 		.orderBy(desc(ankuendigungen.prioritaet), desc(ankuendigungen.createdAt));
 
 	return {

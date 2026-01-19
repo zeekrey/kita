@@ -18,10 +18,7 @@ export async function load({ url }) {
 		.select()
 		.from(dienstplan)
 		.where(
-			and(
-				gte(dienstplan.datum, formatDate(weekStart)),
-				lte(dienstplan.datum, formatDate(weekEnd))
-			)
+			and(gte(dienstplan.datum, formatDate(weekStart)), lte(dienstplan.datum, formatDate(weekEnd)))
 		);
 
 	return {

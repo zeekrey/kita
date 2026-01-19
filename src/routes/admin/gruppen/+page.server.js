@@ -31,10 +31,7 @@ export const actions = {
 			return { error: 'Alle Felder sind erforderlich' };
 		}
 
-		await db
-			.update(gruppen)
-			.set({ name, farbe, updatedAt: new Date() })
-			.where(eq(gruppen.id, id));
+		await db.update(gruppen).set({ name, farbe, updatedAt: new Date() }).where(eq(gruppen.id, id));
 
 		return { success: true };
 	},

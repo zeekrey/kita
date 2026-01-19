@@ -1,6 +1,12 @@
 <script>
 	import { goto, invalidateAll } from '$app/navigation';
-	import { getMonday, getWeekNumber, formatDateShort, addDays, formatDate, DAY_NAMES_SHORT } from '$lib/utils/date.js';
+	import {
+		getWeekNumber,
+		formatDateShort,
+		addDays,
+		formatDate,
+		DAY_NAMES_SHORT
+	} from '$lib/utils/date.js';
 
 	/** @type {{ data: import('./$types').PageData }} */
 	let { data } = $props();
@@ -29,7 +35,7 @@
 
 	function getMealForCell(typ, date) {
 		const dateStr = formatDate(date);
-		return data.meals.find(m => m.typ === typ && m.datum === dateStr);
+		return data.meals.find((m) => m.typ === typ && m.datum === dateStr);
 	}
 
 	function navigateWeek(direction) {
@@ -109,35 +115,36 @@
 	}
 
 	function getMealTypeLabel(typ) {
-		return MEAL_TYPES.find(t => t.id === typ)?.label || typ;
+		return MEAL_TYPES.find((t) => t.id === typ)?.label || typ;
 	}
 
 	function getMealTypeIcon(typ) {
-		return MEAL_TYPES.find(t => t.id === typ)?.icon || '🍴';
+		return MEAL_TYPES.find((t) => t.id === typ)?.icon || '🍴';
 	}
 </script>
 
 <div class="p-6">
-	<div class="flex items-center justify-between mb-6">
+	<div class="mb-6 flex items-center justify-between">
 		<h1 class="text-2xl font-bold text-slate-800">Speiseplan</h1>
 	</div>
 
-	<div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-		<div class="p-4 border-b border-slate-200 flex items-center justify-between">
+	<div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+		<div class="flex items-center justify-between border-b border-slate-200 p-4">
 			<button
 				onclick={() => navigateWeek(-1)}
-				class="px-3 py-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
+				class="rounded-md bg-slate-100 px-3 py-2 text-sm transition-colors hover:bg-slate-200"
 			>
 				&larr; Vorherige
 			</button>
 
 			<div class="flex items-center gap-4">
 				<span class="font-medium text-slate-800">
-					KW {weekNumber}, {formatDateShort(weekStart)} - {formatDateShort(weekEnd)} {weekEnd.getFullYear()}
+					KW {weekNumber}, {formatDateShort(weekStart)} - {formatDateShort(weekEnd)}
+					{weekEnd.getFullYear()}
 				</span>
 				<button
 					onclick={goToToday}
-					class="px-3 py-1 text-sm text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
+					class="rounded-md px-3 py-1 text-sm text-teal-600 transition-colors hover:bg-teal-50"
 				>
 					Heute
 				</button>
@@ -145,7 +152,7 @@
 
 			<button
 				onclick={() => navigateWeek(1)}
-				class="px-3 py-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
+				class="rounded-md bg-slate-100 px-3 py-2 text-sm transition-colors hover:bg-slate-200"
 			>
 				Nächste &rarr;
 			</button>
@@ -155,11 +162,9 @@
 			<table class="w-full">
 				<thead>
 					<tr class="bg-slate-50">
-						<th class="px-4 py-3 text-left text-sm font-medium text-slate-600 w-40">
-							Mahlzeit
-						</th>
+						<th class="w-40 px-4 py-3 text-left text-sm font-medium text-slate-600"> Mahlzeit </th>
 						{#each weekDays as day, i (formatDate(day))}
-							<th class="px-4 py-3 text-center text-sm font-medium text-slate-600 min-w-[140px]">
+							<th class="min-w-[140px] px-4 py-3 text-center text-sm font-medium text-slate-600">
 								<div>{DAY_NAMES_SHORT[i]}</div>
 								<div class="text-xs text-slate-400">{formatDateShort(day)}</div>
 							</th>
@@ -177,42 +182,45 @@
 							</td>
 							{#each weekDays as day (formatDate(day))}
 								{@const meal = getMealForCell(mealType.id, day)}
-								<td class="px-2 py-2 text-center relative">
+								<td class="relative px-2 py-2 text-center">
 									{#if meal}
 										<button
 											onclick={() => openEditForm(meal)}
-											class="w-full px-2 py-2 bg-amber-50 text-amber-900 rounded-md text-sm hover:bg-amber-100 transition-colors text-left"
+											class="w-full rounded-md bg-amber-50 px-2 py-2 text-left text-sm text-amber-900 transition-colors hover:bg-amber-100"
 										>
 											<span class="line-clamp-2">{meal.beschreibung}</span>
 										</button>
 										{#if editingMeal?.id === meal.id}
-											<div class="absolute top-full left-1/2 -translate-x-1/2 z-10 mt-1 bg-white rounded-lg shadow-lg p-4 min-w-[280px]">
+											<div
+												class="absolute top-full left-1/2 z-10 mt-1 min-w-[280px] -translate-x-1/2 rounded-lg bg-white p-4 shadow-lg"
+											>
 												<div class="space-y-4">
 													<div class="font-medium text-slate-800">
-														{getMealTypeIcon(meal.typ)} {getMealTypeLabel(meal.typ)} bearbeiten
+														{getMealTypeIcon(meal.typ)}
+														{getMealTypeLabel(meal.typ)} bearbeiten
 													</div>
 													<textarea
 														bind:value={mealDescription}
 														rows="3"
-														class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+														class="w-full rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:outline-none"
 														placeholder="Beschreibung der Mahlzeit..."
 													></textarea>
-													<div class="flex gap-2 justify-end">
+													<div class="flex justify-end gap-2">
 														<button
 															onclick={handleDelete}
-															class="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
+															class="rounded-md px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
 														>
 															Löschen
 														</button>
 														<button
 															onclick={closeForm}
-															class="px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
+															class="rounded-md px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-100"
 														>
 															Abbrechen
 														</button>
 														<button
 															onclick={handleEdit}
-															class="px-3 py-2 text-sm bg-teal-600 text-white hover:bg-teal-700 rounded-md transition-colors"
+															class="rounded-md bg-teal-600 px-3 py-2 text-sm text-white transition-colors hover:bg-teal-700"
 														>
 															Speichern
 														</button>
@@ -223,32 +231,35 @@
 									{:else}
 										<button
 											onclick={() => openAddForm(mealType.id, day)}
-											class="w-full px-2 py-3 border-2 border-dashed border-slate-200 rounded-md text-slate-400 hover:border-teal-400 hover:text-teal-600 transition-colors"
+											class="w-full rounded-md border-2 border-dashed border-slate-200 px-2 py-3 text-slate-400 transition-colors hover:border-teal-400 hover:text-teal-600"
 										>
 											+
 										</button>
 										{#if selectedCell?.typ === mealType.id && selectedCell?.date === formatDate(day)}
-											<div class="absolute top-full left-1/2 -translate-x-1/2 z-10 mt-1 bg-white rounded-lg shadow-lg p-4 min-w-[280px]">
+											<div
+												class="absolute top-full left-1/2 z-10 mt-1 min-w-[280px] -translate-x-1/2 rounded-lg bg-white p-4 shadow-lg"
+											>
 												<div class="space-y-4">
 													<div class="font-medium text-slate-800">
-														{mealType.icon} {mealType.label} hinzufügen
+														{mealType.icon}
+														{mealType.label} hinzufügen
 													</div>
 													<textarea
 														bind:value={mealDescription}
 														rows="3"
-														class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+														class="w-full rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:outline-none"
 														placeholder="z.B. Vollkornbrot mit Käse und Gurke"
 													></textarea>
-													<div class="flex gap-2 justify-end">
+													<div class="flex justify-end gap-2">
 														<button
 															onclick={closeForm}
-															class="px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
+															class="rounded-md px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-100"
 														>
 															Abbrechen
 														</button>
 														<button
 															onclick={handleCreate}
-															class="px-3 py-2 text-sm bg-teal-600 text-white hover:bg-teal-700 rounded-md transition-colors"
+															class="rounded-md bg-teal-600 px-3 py-2 text-sm text-white transition-colors hover:bg-teal-700"
 														>
 															Speichern
 														</button>

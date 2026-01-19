@@ -3,10 +3,7 @@ import { erzieher, dienstplan } from '$lib/server/db/schema';
 import { eq, and, not } from 'drizzle-orm';
 
 export async function load() {
-	const allErzieher = await db
-		.select()
-		.from(erzieher)
-		.orderBy(erzieher.nachname, erzieher.vorname);
+	const allErzieher = await db.select().from(erzieher).orderBy(erzieher.nachname, erzieher.vorname);
 
 	return { erzieher: allErzieher };
 }

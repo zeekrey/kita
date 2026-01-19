@@ -1,9 +1,11 @@
 # Spec: Authentication
 
 ## Overview
+
 Implement authentication using better-auth with SQLite adapter.
 
 ## Reference
+
 - Documentation: https://www.better-auth.com/docs/installation
 
 ---
@@ -20,16 +22,17 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from './db';
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, {
-    provider: 'sqlite'
-  }),
-  emailAndPassword: {
-    enabled: true
-  }
+	database: drizzleAdapter(db, {
+		provider: 'sqlite'
+	}),
+	emailAndPassword: {
+		enabled: true
+	}
 });
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Auth instance created
 - [ ] SQLite adapter configured
 - [ ] Email/password auth enabled
@@ -44,15 +47,16 @@ export const auth = betterAuth({
 import { auth } from '$lib/server/auth';
 
 export const GET = async ({ request }) => {
-  return auth.handler(request);
+	return auth.handler(request);
 };
 
 export const POST = async ({ request }) => {
-  return auth.handler(request);
+	return auth.handler(request);
 };
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Auth endpoints respond correctly
 - [ ] Sign up works
 - [ ] Sign in works
@@ -65,6 +69,7 @@ export const POST = async ({ request }) => {
 **File**: `src/routes/admin/login/+page.svelte`
 
 **UI Requirements**:
+
 - Email input field
 - Password input field
 - "Anmelden" (Login) button
@@ -72,12 +77,14 @@ export const POST = async ({ request }) => {
 - Redirect to `/admin` on success
 
 **German Labels**:
+
 - Email: "E-Mail"
 - Password: "Passwort"
 - Submit: "Anmelden"
 - Error: "Anmeldung fehlgeschlagen"
 
 **Acceptance Criteria**:
+
 - [ ] Login form renders
 - [ ] Form validation works
 - [ ] Successful login redirects to /admin
@@ -95,35 +102,37 @@ import { redirect } from '@sveltejs/kit';
 import { auth } from '$lib/server/auth';
 
 export const load = async ({ request, url }) => {
-  const session = await auth.api.getSession({ headers: request.headers });
+	const session = await auth.api.getSession({ headers: request.headers });
 
-  // Allow access to login page without auth
-  if (url.pathname === '/admin/login') {
-    if (session) {
-      throw redirect(302, '/admin');
-    }
-    return {};
-  }
+	// Allow access to login page without auth
+	if (url.pathname === '/admin/login') {
+		if (session) {
+			throw redirect(302, '/admin');
+		}
+		return {};
+	}
 
-  // Require auth for all other admin pages
-  if (!session) {
-    throw redirect(302, '/admin/login');
-  }
+	// Require auth for all other admin pages
+	if (!session) {
+		throw redirect(302, '/admin/login');
+	}
 
-  return {
-    user: session.user
-  };
+	return {
+		user: session.user
+	};
 };
 ```
 
 **File**: `src/routes/admin/+layout.svelte`
 
 **UI Requirements**:
+
 - Sidebar navigation with links to all admin sections
 - Header with user info and logout button
 - Main content area
 
 **Navigation Items** (German):
+
 - Übersicht (Overview) → `/admin`
 - Kinder → `/admin/kinder`
 - Gruppen → `/admin/gruppen`
@@ -133,6 +142,7 @@ export const load = async ({ request, url }) => {
 - Ankündigungen → `/admin/ankuendigungen`
 
 **Acceptance Criteria**:
+
 - [ ] Unauthenticated users redirected to login
 - [ ] Authenticated users see admin layout
 - [ ] Navigation renders all links
@@ -143,11 +153,13 @@ export const load = async ({ request, url }) => {
 ### 2.5 Add Logout Functionality
 
 **Implementation**:
+
 - Logout button in admin header
 - Calls better-auth sign out
 - Redirects to login page
 
 **Acceptance Criteria**:
+
 - [ ] Logout button visible in admin layout
 - [ ] Clicking logout signs out user
 - [ ] User redirected to login page
@@ -167,6 +179,7 @@ export const authClient = createAuthClient();
 ---
 
 ## Files to Create/Modify
+
 - `src/lib/server/auth.js` (auth configuration)
 - `src/lib/auth-client.js` (client-side auth)
 - `src/routes/api/auth/[...all]/+server.js` (API handler)

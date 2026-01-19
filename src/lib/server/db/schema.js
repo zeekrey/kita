@@ -85,7 +85,9 @@ export const accountRelations = relations(account, ({ one }) => ({
 
 // Groups table
 export const gruppen = sqliteTable('gruppen', {
-	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
 	name: text('name').notNull(),
 	farbe: text('farbe').notNull(), // hex color e.g. "#FF5733"
 	createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
@@ -94,7 +96,9 @@ export const gruppen = sqliteTable('gruppen', {
 
 // Children table
 export const kinder = sqliteTable('kinder', {
-	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
 	vorname: text('vorname').notNull(),
 	nachname: text('nachname').notNull(),
 	geburtstag: text('geburtstag').notNull(), // ISO date string YYYY-MM-DD
@@ -106,7 +110,9 @@ export const kinder = sqliteTable('kinder', {
 
 // Teachers table
 export const erzieher = sqliteTable('erzieher', {
-	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
 	vorname: text('vorname').notNull(),
 	nachname: text('nachname').notNull(),
 	email: text('email').notNull().unique(),
@@ -117,8 +123,12 @@ export const erzieher = sqliteTable('erzieher', {
 
 // Teacher schedules table
 export const dienstplan = sqliteTable('dienstplan', {
-	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-	erzieherId: text('erzieher_id').notNull().references(() => erzieher.id),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	erzieherId: text('erzieher_id')
+		.notNull()
+		.references(() => erzieher.id),
 	datum: text('datum').notNull(), // ISO date string YYYY-MM-DD
 	startZeit: text('start_zeit').notNull(), // HH:MM format
 	endZeit: text('end_zeit').notNull(), // HH:MM format
@@ -128,7 +138,9 @@ export const dienstplan = sqliteTable('dienstplan', {
 
 // Meals table
 export const mahlzeiten = sqliteTable('mahlzeiten', {
-	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
 	datum: text('datum').notNull(), // ISO date string YYYY-MM-DD
 	typ: text('typ').notNull(), // 'fruehstueck' | 'mittagessen' | 'snack'
 	beschreibung: text('beschreibung').notNull(),
@@ -138,7 +150,9 @@ export const mahlzeiten = sqliteTable('mahlzeiten', {
 
 // Announcements table
 export const ankuendigungen = sqliteTable('ankuendigungen', {
-	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
 	titel: text('titel').notNull(),
 	nachricht: text('nachricht').notNull(),
 	gueltigVon: text('gueltig_von').notNull(), // ISO date string YYYY-MM-DD

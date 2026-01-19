@@ -63,8 +63,20 @@ async function seed() {
 	// Create Groups
 	console.log('👥 Creating groups...');
 	const groups = [
-		{ id: crypto.randomUUID(), name: 'Sonnenkäfer', farbe: '#FF6B6B', createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), name: 'Schmetterlinge', farbe: '#4ECDC4', createdAt: now, updatedAt: now },
+		{
+			id: crypto.randomUUID(),
+			name: 'Sonnenkäfer',
+			farbe: '#FF6B6B',
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			name: 'Schmetterlinge',
+			farbe: '#4ECDC4',
+			createdAt: now,
+			updatedAt: now
+		},
 		{ id: crypto.randomUUID(), name: 'Löwenzahn', farbe: '#45B7D1', createdAt: now, updatedAt: now }
 	];
 	for (const group of groups) {
@@ -75,10 +87,42 @@ async function seed() {
 	// Create Teachers
 	console.log('👩‍🏫 Creating teachers...');
 	const teachers = [
-		{ id: crypto.randomUUID(), vorname: 'Maria', nachname: 'Schmidt', email: 'maria.schmidt@kita.de', fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Thomas', nachname: 'Krause', email: 'thomas.krause@kita.de', fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Lisa', nachname: 'Weber', email: 'lisa.weber@kita.de', fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Anna', nachname: 'Braun', email: 'anna.braun@kita.de', fotoPath: null, createdAt: now, updatedAt: now }
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Maria',
+			nachname: 'Schmidt',
+			email: 'maria.schmidt@kita.de',
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Thomas',
+			nachname: 'Krause',
+			email: 'thomas.krause@kita.de',
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Lisa',
+			nachname: 'Weber',
+			email: 'lisa.weber@kita.de',
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Anna',
+			nachname: 'Braun',
+			email: 'anna.braun@kita.de',
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		}
 	];
 	for (const teacher of teachers) {
 		db.insert(schema.erzieher).values(teacher).run();
@@ -91,16 +135,106 @@ async function seed() {
 	const birthdayToday = `2020-${todayMonthDay}`; // Child born on this day in 2020
 
 	const children = [
-		{ id: crypto.randomUUID(), vorname: 'Emma', nachname: 'Müller', geburtstag: birthdayToday, gruppeId: groups[0].id, fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Luca', nachname: 'Fischer', geburtstag: '2021-03-15', gruppeId: groups[0].id, fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Mia', nachname: 'Wagner', geburtstag: '2020-07-22', gruppeId: groups[0].id, fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Noah', nachname: 'Becker', geburtstag: '2021-01-08', gruppeId: groups[1].id, fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Hannah', nachname: 'Hoffmann', geburtstag: '2020-11-30', gruppeId: groups[1].id, fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Elias', nachname: 'Schäfer', geburtstag: '2021-06-14', gruppeId: groups[1].id, fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Sophie', nachname: 'Koch', geburtstag: '2020-04-02', gruppeId: groups[2].id, fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Ben', nachname: 'Richter', geburtstag: '2021-09-19', gruppeId: groups[2].id, fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Emilia', nachname: 'Klein', geburtstag: '2020-12-25', gruppeId: groups[2].id, fotoPath: null, createdAt: now, updatedAt: now },
-		{ id: crypto.randomUUID(), vorname: 'Felix', nachname: 'Wolf', geburtstag: '2021-02-28', gruppeId: groups[2].id, fotoPath: null, createdAt: now, updatedAt: now }
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Emma',
+			nachname: 'Müller',
+			geburtstag: birthdayToday,
+			gruppeId: groups[0].id,
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Luca',
+			nachname: 'Fischer',
+			geburtstag: '2021-03-15',
+			gruppeId: groups[0].id,
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Mia',
+			nachname: 'Wagner',
+			geburtstag: '2020-07-22',
+			gruppeId: groups[0].id,
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Noah',
+			nachname: 'Becker',
+			geburtstag: '2021-01-08',
+			gruppeId: groups[1].id,
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Hannah',
+			nachname: 'Hoffmann',
+			geburtstag: '2020-11-30',
+			gruppeId: groups[1].id,
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Elias',
+			nachname: 'Schäfer',
+			geburtstag: '2021-06-14',
+			gruppeId: groups[1].id,
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Sophie',
+			nachname: 'Koch',
+			geburtstag: '2020-04-02',
+			gruppeId: groups[2].id,
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Ben',
+			nachname: 'Richter',
+			geburtstag: '2021-09-19',
+			gruppeId: groups[2].id,
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Emilia',
+			nachname: 'Klein',
+			geburtstag: '2020-12-25',
+			gruppeId: groups[2].id,
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		},
+		{
+			id: crypto.randomUUID(),
+			vorname: 'Felix',
+			nachname: 'Wolf',
+			geburtstag: '2021-02-28',
+			gruppeId: groups[2].id,
+			fotoPath: null,
+			createdAt: now,
+			updatedAt: now
+		}
 	];
 	for (const child of children) {
 		db.insert(schema.kinder).values(child).run();
@@ -199,9 +333,30 @@ async function seed() {
 	for (let i = 0; i < 5; i++) {
 		const datum = formatDate(weekDays[i]);
 		meals.push(
-			{ id: crypto.randomUUID(), datum, typ: 'fruehstueck', beschreibung: mealDescriptions.fruehstueck[i], createdAt: now, updatedAt: now },
-			{ id: crypto.randomUUID(), datum, typ: 'mittagessen', beschreibung: mealDescriptions.mittagessen[i], createdAt: now, updatedAt: now },
-			{ id: crypto.randomUUID(), datum, typ: 'snack', beschreibung: mealDescriptions.snack[i], createdAt: now, updatedAt: now }
+			{
+				id: crypto.randomUUID(),
+				datum,
+				typ: 'fruehstueck',
+				beschreibung: mealDescriptions.fruehstueck[i],
+				createdAt: now,
+				updatedAt: now
+			},
+			{
+				id: crypto.randomUUID(),
+				datum,
+				typ: 'mittagessen',
+				beschreibung: mealDescriptions.mittagessen[i],
+				createdAt: now,
+				updatedAt: now
+			},
+			{
+				id: crypto.randomUUID(),
+				datum,
+				typ: 'snack',
+				beschreibung: mealDescriptions.snack[i],
+				createdAt: now,
+				updatedAt: now
+			}
 		);
 	}
 
@@ -219,7 +374,8 @@ async function seed() {
 		{
 			id: crypto.randomUUID(),
 			titel: 'Sommerfest am Samstag',
-			nachricht: 'Wir laden alle Familien herzlich zum Sommerfest ein! Es gibt Spiele, Musik und ein Buffet. Bitte bringen Sie gute Laune und einen Salat oder Kuchen mit.',
+			nachricht:
+				'Wir laden alle Familien herzlich zum Sommerfest ein! Es gibt Spiele, Musik und ein Buffet. Bitte bringen Sie gute Laune und einen Salat oder Kuchen mit.',
 			gueltigVon: todayStr,
 			gueltigBis: formatDate(nextWeek),
 			prioritaet: 'wichtig',
@@ -229,7 +385,8 @@ async function seed() {
 		{
 			id: crypto.randomUUID(),
 			titel: 'Neue Öffnungszeiten ab Februar',
-			nachricht: 'Ab dem 1. Februar gelten neue Öffnungszeiten: Montag bis Freitag von 7:00 bis 18:00 Uhr. Der Frühdienst beginnt wie gewohnt um 7:00 Uhr.',
+			nachricht:
+				'Ab dem 1. Februar gelten neue Öffnungszeiten: Montag bis Freitag von 7:00 bis 18:00 Uhr. Der Frühdienst beginnt wie gewohnt um 7:00 Uhr.',
 			gueltigVon: todayStr,
 			gueltigBis: formatDate(nextWeek),
 			prioritaet: 'normal',
@@ -239,7 +396,8 @@ async function seed() {
 		{
 			id: crypto.randomUUID(),
 			titel: 'Bitte Wechselkleidung mitbringen',
-			nachricht: 'Liebe Eltern, bitte denken Sie daran, Wechselkleidung für Ihr Kind mitzubringen. Besonders jetzt im Winter brauchen wir warme Ersatzkleidung.',
+			nachricht:
+				'Liebe Eltern, bitte denken Sie daran, Wechselkleidung für Ihr Kind mitzubringen. Besonders jetzt im Winter brauchen wir warme Ersatzkleidung.',
 			gueltigVon: todayStr,
 			gueltigBis: formatDate(nextWeek),
 			prioritaet: 'normal',

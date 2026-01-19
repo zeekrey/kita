@@ -1,9 +1,11 @@
 # Spec: Public Dashboard
 
 ## Overview
+
 Public display for kindergarten entrance showing daily information.
 
 ## Route
+
 `/` (root)
 
 ---
@@ -16,74 +18,87 @@ Public display for kindergarten entrance showing daily information.
 
 ```javascript
 import { db } from '$lib/server/db';
-import { kinder, erzieher, dienstplan, mahlzeiten, ankuendigungen, gruppen } from '$lib/server/db/schema';
+import {
+	kinder,
+	erzieher,
+	dienstplan,
+	mahlzeiten,
+	ankuendigungen,
+	gruppen
+} from '$lib/server/db/schema';
 import { eq, and, lte, gte, sql } from 'drizzle-orm';
 
 export async function load() {
-  const today = new Date().toISOString().split('T')[0];
-  const currentTime = new Date().toTimeString().slice(0, 5); // HH:MM
+	const today = new Date().toISOString().split('T')[0];
+	const currentTime = new Date().toTimeString().slice(0, 5); // HH:MM
 
-  // Get today's month and day for birthday check
-  const monthDay = today.slice(5); // MM-DD
+	// Get today's month and day for birthday check
+	const monthDay = today.slice(5); // MM-DD
 
-  // Get birthday children (match month-day regardless of year)
-  const birthdayKinder = await db.select({
-    id: kinder.id,
-    vorname: kinder.vorname,
-    nachname: kinder.nachname,
-    geburtstag: kinder.geburtstag,
-    fotoPath: kinder.fotoPath,
-    gruppe: gruppen
-  })
-  .from(kinder)
-  .leftJoin(gruppen, eq(kinder.gruppeId, gruppen.id))
-  .where(sql`substr(${kinder.geburtstag}, 6) = ${monthDay}`);
+	// Get birthday children (match month-day regardless of year)
+	const birthdayKinder = await db
+		.select({
+			id: kinder.id,
+			vorname: kinder.vorname,
+			nachname: kinder.nachname,
+			geburtstag: kinder.geburtstag,
+			fotoPath: kinder.fotoPath,
+			gruppe: gruppen
+		})
+		.from(kinder)
+		.leftJoin(gruppen, eq(kinder.gruppeId, gruppen.id))
+		.where(sql`substr(${kinder.geburtstag}, 6) = ${monthDay}`);
 
-  // Get teachers on duty now
-  const onDutyTeachers = await db.select({
-    id: erzieher.id,
-    vorname: erzieher.vorname,
-    nachname: erzieher.nachname,
-    fotoPath: erzieher.fotoPath,
-    startZeit: dienstplan.startZeit,
-    endZeit: dienstplan.endZeit
-  })
-  .from(dienstplan)
-  .innerJoin(erzieher, eq(dienstplan.erzieherId, erzieher.id))
-  .where(and(
-    eq(dienstplan.datum, today),
-    lte(dienstplan.startZeit, currentTime),
-    gte(dienstplan.endZeit, currentTime)
-  ));
+	// Get teachers on duty now
+	const onDutyTeachers = await db
+		.select({
+			id: erzieher.id,
+			vorname: erzieher.vorname,
+			nachname: erzieher.nachname,
+			fotoPath: erzieher.fotoPath,
+			startZeit: dienstplan.startZeit,
+			endZeit: dienstplan.endZeit
+		})
+		.from(dienstplan)
+		.innerJoin(erzieher, eq(dienstplan.erzieherId, erzieher.id))
+		.where(
+			and(
+				eq(dienstplan.datum, today),
+				lte(dienstplan.startZeit, currentTime),
+				gte(dienstplan.endZeit, currentTime)
+			)
+		);
 
-  // Get today's meals
-  const todayMeals = await db.select()
-    .from(mahlzeiten)
-    .where(eq(mahlzeiten.datum, today))
-    .orderBy(sql`CASE typ WHEN 'fruehstueck' THEN 1 WHEN 'mittagessen' THEN 2 WHEN 'snack' THEN 3 END`);
+	// Get today's meals
+	const todayMeals = await db
+		.select()
+		.from(mahlzeiten)
+		.where(eq(mahlzeiten.datum, today))
+		.orderBy(
+			sql`CASE typ WHEN 'fruehstueck' THEN 1 WHEN 'mittagessen' THEN 2 WHEN 'snack' THEN 3 END`
+		);
 
-  // Get active announcements
-  const activeAnnouncements = await db.select()
-    .from(ankuendigungen)
-    .where(and(
-      lte(ankuendigungen.gueltigVon, today),
-      gte(ankuendigungen.gueltigBis, today)
-    ))
-    .orderBy(sql`CASE prioritaet WHEN 'wichtig' THEN 0 ELSE 1 END`);
+	// Get active announcements
+	const activeAnnouncements = await db
+		.select()
+		.from(ankuendigungen)
+		.where(and(lte(ankuendigungen.gueltigVon, today), gte(ankuendigungen.gueltigBis, today)))
+		.orderBy(sql`CASE prioritaet WHEN 'wichtig' THEN 0 ELSE 1 END`);
 
-  return {
-    birthdayKinder,
-    onDutyTeachers,
-    todayMeals,
-    activeAnnouncements,
-    currentDate: today
-  };
+	return {
+		birthdayKinder,
+		onDutyTeachers,
+		todayMeals,
+		activeAnnouncements,
+		currentDate: today
+	};
 }
 ```
 
 **File**: `src/routes/+page.svelte`
 
 **Layout Structure** (Widescreen 16:9 optimized):
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  HEADER: Kindergarten Name + Date + Time                    │
@@ -101,24 +116,27 @@ export async function load() {
 ```
 
 **Design Specs**:
+
 - Full viewport height (100vh)
 - Dark background with light cards
 - Large, readable typography
 - Generous spacing
 
 **CSS Variables**:
+
 ```css
 :root {
-  --dashboard-bg: #1a1a2e;
-  --card-bg: #16213e;
-  --accent-warm: #e94560;
-  --accent-teal: #0f3460;
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
+	--dashboard-bg: #1a1a2e;
+	--card-bg: #16213e;
+	--accent-warm: #e94560;
+	--accent-teal: #0f3460;
+	--text-primary: #ffffff;
+	--text-secondary: #a0a0a0;
 }
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Layout fills viewport
 - [ ] Responsive to widescreen aspect ratio
 - [ ] All sections visible without scrolling
@@ -129,11 +147,13 @@ export async function load() {
 ### 10.2 Implement Announcements Section
 
 **Display Requirements**:
+
 - Show all active announcements
 - Important (wichtig) announcements highlighted
 - Auto-scroll if many announcements (optional)
 
 **Card Structure**:
+
 ```
 ┌─────────────────────────────┐
 │ ⚠️ WICHTIG                  │  ← badge for important
@@ -144,11 +164,13 @@ export async function load() {
 ```
 
 **German Labels**:
+
 - Section title: "Ankündigungen"
 - Important badge: "Wichtig"
 - Empty state: "Keine Ankündigungen"
 
 **Acceptance Criteria**:
+
 - [ ] Active announcements displayed
 - [ ] Important announcements visually distinct
 - [ ] Empty state handled
@@ -158,11 +180,13 @@ export async function load() {
 ### 10.3 Implement Birthday Section
 
 **Display Requirements**:
+
 - Show children with birthday today
 - Display photo (or placeholder), name, age
 - Celebratory styling (confetti, balloons, etc.)
 
 **Card Structure**:
+
 ```
 ┌─────────────────────────────┐
 │      🎂 Geburtstag! 🎂      │
@@ -175,25 +199,28 @@ export async function load() {
 ```
 
 **Age Calculation**:
+
 ```javascript
 function calculateAge(birthday) {
-  const today = new Date();
-  const birthDate = new Date(birthday);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  return age + 1; // Age they're turning today
+	const today = new Date();
+	const birthDate = new Date(birthday);
+	let age = today.getFullYear() - birthDate.getFullYear();
+	const monthDiff = today.getMonth() - birthDate.getMonth();
+	if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+		age--;
+	}
+	return age + 1; // Age they're turning today
 }
 ```
 
 **German Labels**:
+
 - Section title: "Geburtstagskinder"
 - Turning age: "wird heute {age} Jahre alt!"
 - Empty state: "Heute hat niemand Geburtstag"
 
 **Acceptance Criteria**:
+
 - [ ] Birthday children displayed with photos
 - [ ] Age calculation correct
 - [ ] Celebratory visual treatment
@@ -204,11 +231,13 @@ function calculateAge(birthday) {
 ### 10.4 Implement Meals Section
 
 **Display Requirements**:
+
 - Show all three meals for today
 - Icon + meal type + description
 - Clear visual hierarchy
 
 **Layout**:
+
 ```
 ┌─────────────────────────────┐
 │   🍽️ Speiseplan             │
@@ -226,6 +255,7 @@ function calculateAge(birthday) {
 ```
 
 **German Labels**:
+
 - Section title: "Speiseplan"
 - Breakfast: "Frühstück"
 - Lunch: "Mittagessen"
@@ -233,6 +263,7 @@ function calculateAge(birthday) {
 - Empty state: "Kein Speiseplan eingetragen"
 
 **Acceptance Criteria**:
+
 - [ ] All meal types shown
 - [ ] Clear meal type labels
 - [ ] Empty state for missing meals
@@ -242,11 +273,13 @@ function calculateAge(birthday) {
 ### 10.5 Implement Teachers On Duty Section
 
 **Display Requirements**:
+
 - Show teachers currently on shift
 - Display photo and name
 - Update throughout the day as shifts change
 
 **Layout**:
+
 ```
 ┌─────────────────────────────┐
 │   👩‍🏫 Heute anwesend        │
@@ -258,10 +291,12 @@ function calculateAge(birthday) {
 ```
 
 **German Labels**:
+
 - Section title: "Heute anwesend"
 - Empty state: "Aktuell niemand im Dienst"
 
 **Acceptance Criteria**:
+
 - [ ] Current teachers displayed
 - [ ] Photos shown (or placeholder)
 - [ ] Updates when data refreshes
@@ -274,28 +309,31 @@ function calculateAge(birthday) {
 **Strategy**: Client-side polling every 30 seconds
 
 **Implementation**:
+
 ```svelte
 <script>
-  import { onMount } from 'svelte';
-  import { invalidateAll } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
 
-  let { data } = $props();
+	let { data } = $props();
 
-  onMount(() => {
-    const interval = setInterval(() => {
-      invalidateAll();
-    }, 30000); // 30 seconds
+	onMount(() => {
+		const interval = setInterval(() => {
+			invalidateAll();
+		}, 30000); // 30 seconds
 
-    return () => clearInterval(interval);
-  });
+		return () => clearInterval(interval);
+	});
 </script>
 ```
 
 **Optional: Visual Refresh Indicator**:
+
 - Small pulsing dot in corner
 - Or subtle fade transition on refresh
 
 **Acceptance Criteria**:
+
 - [ ] Data refreshes every 30 seconds
 - [ ] No full page reload (smooth update)
 - [ ] Clock updates in real-time
@@ -305,35 +343,46 @@ function calculateAge(birthday) {
 ### 10.7 Add Entrance Animations
 
 **Animation Strategy**:
+
 - Staggered entrance on page load
 - Subtle scale/fade for each section
 - CSS-only where possible
 
 **Implementation**:
+
 ```css
 .dashboard-section {
-  animation: fadeSlideIn 0.6s ease-out forwards;
-  opacity: 0;
+	animation: fadeSlideIn 0.6s ease-out forwards;
+	opacity: 0;
 }
 
-.dashboard-section:nth-child(1) { animation-delay: 0.1s; }
-.dashboard-section:nth-child(2) { animation-delay: 0.2s; }
-.dashboard-section:nth-child(3) { animation-delay: 0.3s; }
-.dashboard-section:nth-child(4) { animation-delay: 0.4s; }
+.dashboard-section:nth-child(1) {
+	animation-delay: 0.1s;
+}
+.dashboard-section:nth-child(2) {
+	animation-delay: 0.2s;
+}
+.dashboard-section:nth-child(3) {
+	animation-delay: 0.3s;
+}
+.dashboard-section:nth-child(4) {
+	animation-delay: 0.4s;
+}
 
 @keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Sections animate in on load
 - [ ] Staggered timing creates visual interest
 - [ ] Animations don't trigger on refresh
@@ -346,41 +395,42 @@ function calculateAge(birthday) {
 
 ```svelte
 <script>
-  import { onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
-  let time = $state(new Date());
+	let time = $state(new Date());
 
-  onMount(() => {
-    const interval = setInterval(() => {
-      time = new Date();
-    }, 1000);
+	onMount(() => {
+		const interval = setInterval(() => {
+			time = new Date();
+		}, 1000);
 
-    return () => clearInterval(interval);
-  });
+		return () => clearInterval(interval);
+	});
 
-  let formattedTime = $derived(
-    time.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
-  );
+	let formattedTime = $derived(
+		time.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
+	);
 
-  let formattedDate = $derived(
-    time.toLocaleDateString('de-DE', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    })
-  );
+	let formattedDate = $derived(
+		time.toLocaleDateString('de-DE', {
+			weekday: 'long',
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric'
+		})
+	);
 </script>
 
 <div class="clock">
-  <div class="time">{formattedTime}</div>
-  <div class="date">{formattedDate}</div>
+	<div class="time">{formattedTime}</div>
+	<div class="date">{formattedDate}</div>
 </div>
 ```
 
 ---
 
 ## Files to Create/Modify
+
 - `src/routes/+page.server.js` (data loading)
 - `src/routes/+page.svelte` (dashboard layout)
 - `src/lib/components/Clock.svelte` (real-time clock)

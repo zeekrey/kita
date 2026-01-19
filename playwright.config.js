@@ -12,8 +12,8 @@ export default defineConfig({
 	testDir: 'e2e',
 	// Run tests in parallel
 	workers: process.env.CI ? 1 : undefined,
-	// Retry failed tests
-	retries: process.env.CI ? 2 : 0,
+	// Retry failed tests - use retries for flaky network issues
+	retries: process.env.CI ? 2 : 1,
 	// Report options
 	reporter: process.env.CI ? 'dot' : 'list',
 	// Timeout settings

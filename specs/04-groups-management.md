@@ -1,9 +1,11 @@
 # Spec: Groups Management
 
 ## Overview
+
 CRUD interface for managing kindergarten groups (Gruppen).
 
 ## Route
+
 `/admin/gruppen`
 
 ---
@@ -19,14 +21,15 @@ import { db } from '$lib/server/db';
 import { gruppen } from '$lib/server/db/schema';
 
 export async function load() {
-  const allGroups = await db.select().from(gruppen).orderBy(gruppen.name);
-  return { gruppen: allGroups };
+	const allGroups = await db.select().from(gruppen).orderBy(gruppen.name);
+	return { gruppen: allGroups };
 }
 ```
 
 **File**: `src/routes/admin/gruppen/+page.svelte`
 
 **UI Requirements**:
+
 - Page title: "Gruppen"
 - "Neue Gruppe" button
 - Table/grid showing all groups
@@ -34,6 +37,7 @@ export async function load() {
 - Edit/Delete actions per group
 
 **Acceptance Criteria**:
+
 - [ ] Page loads and displays groups
 - [ ] Empty state shown when no groups
 - [ ] Groups sorted alphabetically
@@ -43,6 +47,7 @@ export async function load() {
 ### 4.2 Create Add Group Form
 
 **Implementation Options**:
+
 - Modal dialog (using Bits UI Dialog)
 - OR inline form
 
@@ -53,20 +58,22 @@ export async function load() {
 | farbe | Farbe | color picker | Yes |
 
 **Server Action** (in `+page.server.js`):
+
 ```javascript
 export const actions = {
-  create: async ({ request }) => {
-    const formData = await request.formData();
-    const name = formData.get('name');
-    const farbe = formData.get('farbe');
+	create: async ({ request }) => {
+		const formData = await request.formData();
+		const name = formData.get('name');
+		const farbe = formData.get('farbe');
 
-    await db.insert(gruppen).values({ name, farbe });
-    return { success: true };
-  }
+		await db.insert(gruppen).values({ name, farbe });
+		return { success: true };
+	}
 };
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Form renders with all fields
 - [ ] Validation prevents empty name
 - [ ] Color picker works
@@ -82,22 +89,22 @@ export const actions = {
 **Form Fields**: Same as create
 
 **Server Action**:
+
 ```javascript
 edit: async ({ request }) => {
-  const formData = await request.formData();
-  const id = formData.get('id');
-  const name = formData.get('name');
-  const farbe = formData.get('farbe');
+	const formData = await request.formData();
+	const id = formData.get('id');
+	const name = formData.get('name');
+	const farbe = formData.get('farbe');
 
-  await db.update(gruppen)
-    .set({ name, farbe, updatedAt: new Date() })
-    .where(eq(gruppen.id, id));
+	await db.update(gruppen).set({ name, farbe, updatedAt: new Date() }).where(eq(gruppen.id, id));
 
-  return { success: true };
-}
+	return { success: true };
+};
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Form pre-filled with existing data
 - [ ] Changes saved correctly
 - [ ] List updates after edit
@@ -107,11 +114,13 @@ edit: async ({ request }) => {
 ### 4.4 Implement Delete Group
 
 **Behavior**:
+
 - Confirmation dialog before delete
 - Check if group has children assigned
 - If children assigned, show warning/prevent delete
 
 **Server Action**:
+
 ```javascript
 delete: async ({ request }) => {
   const formData = await request.formData();
@@ -133,6 +142,7 @@ delete: async ({ request }) => {
 ```
 
 **German Labels**:
+
 - Confirm title: "Gruppe löschen?"
 - Confirm message: "Möchten Sie diese Gruppe wirklich löschen?"
 - Error: "Gruppe hat noch Kinder zugewiesen"
@@ -140,6 +150,7 @@ delete: async ({ request }) => {
 - Cancel button: "Abbrechen"
 
 **Acceptance Criteria**:
+
 - [ ] Confirmation dialog shown before delete
 - [ ] Cannot delete group with assigned children
 - [ ] Successful delete removes group from list
@@ -149,24 +160,26 @@ delete: async ({ request }) => {
 ## Color Picker Component
 
 **Suggested Colors** (predefined palette):
+
 ```javascript
 const presetColors = [
-  '#FF6B6B', // Red
-  '#4ECDC4', // Teal
-  '#45B7D1', // Blue
-  '#96CEB4', // Green
-  '#FFEAA7', // Yellow
-  '#DDA0DD', // Plum
-  '#98D8C8', // Mint
-  '#F7DC6F', // Gold
-  '#BB8FCE', // Purple
-  '#85C1E9', // Light Blue
+	'#FF6B6B', // Red
+	'#4ECDC4', // Teal
+	'#45B7D1', // Blue
+	'#96CEB4', // Green
+	'#FFEAA7', // Yellow
+	'#DDA0DD', // Plum
+	'#98D8C8', // Mint
+	'#F7DC6F', // Gold
+	'#BB8FCE', // Purple
+	'#85C1E9' // Light Blue
 ];
 ```
 
 ---
 
 ## Files to Create/Modify
+
 - `src/routes/admin/gruppen/+page.server.js`
 - `src/routes/admin/gruppen/+page.svelte`
 - `src/lib/components/ColorPicker.svelte` (optional reusable component)

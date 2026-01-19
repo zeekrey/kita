@@ -1,8 +1,13 @@
 <script>
-	import { enhance } from '$app/forms';
 	import { goto, invalidateAll } from '$app/navigation';
 	import TimeSlotPicker from '$lib/components/TimeSlotPicker.svelte';
-	import { getMonday, getWeekNumber, formatDateShort, addDays, formatDate, DAY_NAMES_SHORT } from '$lib/utils/date.js';
+	import {
+		getWeekNumber,
+		formatDateShort,
+		addDays,
+		formatDate,
+		DAY_NAMES_SHORT
+	} from '$lib/utils/date.js';
 
 	/** @type {{ data: import('./$types').PageData }} */
 	let { data } = $props();
@@ -24,7 +29,7 @@
 
 	function getScheduleForCell(teacherId, date) {
 		const dateStr = formatDate(date);
-		return data.schedules.find(s => s.erzieherId === teacherId && s.datum === dateStr);
+		return data.schedules.find((s) => s.erzieherId === teacherId && s.datum === dateStr);
 	}
 
 	function navigateWeek(direction) {
@@ -92,26 +97,27 @@
 </script>
 
 <div class="p-6">
-	<div class="flex items-center justify-between mb-6">
+	<div class="mb-6 flex items-center justify-between">
 		<h1 class="text-2xl font-bold text-slate-800">Dienstplan</h1>
 	</div>
 
-	<div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-		<div class="p-4 border-b border-slate-200 flex items-center justify-between">
+	<div class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+		<div class="flex items-center justify-between border-b border-slate-200 p-4">
 			<button
 				onclick={() => navigateWeek(-1)}
-				class="px-3 py-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
+				class="rounded-md bg-slate-100 px-3 py-2 text-sm transition-colors hover:bg-slate-200"
 			>
 				&larr; Vorherige
 			</button>
 
 			<div class="flex items-center gap-4">
 				<span class="font-medium text-slate-800">
-					KW {weekNumber}, {formatDateShort(weekStart)} - {formatDateShort(weekEnd)} {weekEnd.getFullYear()}
+					KW {weekNumber}, {formatDateShort(weekStart)} - {formatDateShort(weekEnd)}
+					{weekEnd.getFullYear()}
 				</span>
 				<button
 					onclick={goToToday}
-					class="px-3 py-1 text-sm text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
+					class="rounded-md px-3 py-1 text-sm text-teal-600 transition-colors hover:bg-teal-50"
 				>
 					Heute
 				</button>
@@ -119,7 +125,7 @@
 
 			<button
 				onclick={() => navigateWeek(1)}
-				class="px-3 py-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
+				class="rounded-md bg-slate-100 px-3 py-2 text-sm transition-colors hover:bg-slate-200"
 			>
 				Nächste &rarr;
 			</button>
@@ -128,7 +134,7 @@
 		{#if data.teachers.length === 0}
 			<div class="p-8 text-center text-slate-500">
 				<p>Noch keine Erzieher vorhanden.</p>
-				<a href="/admin/erzieher" class="text-teal-600 hover:underline mt-2 inline-block">
+				<a href="/admin/erzieher" class="mt-2 inline-block text-teal-600 hover:underline">
 					Erzieher hinzufügen
 				</a>
 			</div>
@@ -137,11 +143,11 @@
 				<table class="w-full">
 					<thead>
 						<tr class="bg-slate-50">
-							<th class="px-4 py-3 text-left text-sm font-medium text-slate-600 w-48">
+							<th class="w-48 px-4 py-3 text-left text-sm font-medium text-slate-600">
 								Erzieher/in
 							</th>
 							{#each weekDays as day, i (formatDate(day))}
-								<th class="px-4 py-3 text-center text-sm font-medium text-slate-600 min-w-[120px]">
+								<th class="min-w-[120px] px-4 py-3 text-center text-sm font-medium text-slate-600">
 									<div>{DAY_NAMES_SHORT[i]}</div>
 									<div class="text-xs text-slate-400">{formatDateShort(day)}</div>
 								</th>
@@ -157,30 +163,33 @@
 											<img
 												src={teacher.fotoPath}
 												alt=""
-												class="w-8 h-8 rounded-full object-cover"
+												class="h-8 w-8 rounded-full object-cover"
 											/>
 										{:else}
-											<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-sm">
+											<div
+												class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-sm text-slate-500"
+											>
 												{teacher.vorname[0]}{teacher.nachname[0]}
 											</div>
 										{/if}
 										<span class="font-medium text-slate-800">
-											{teacher.vorname} {teacher.nachname}
+											{teacher.vorname}
+											{teacher.nachname}
 										</span>
 									</div>
 								</td>
 								{#each weekDays as day (formatDate(day))}
 									{@const schedule = getScheduleForCell(teacher.id, day)}
-									<td class="px-2 py-2 text-center relative">
+									<td class="relative px-2 py-2 text-center">
 										{#if schedule}
 											<button
 												onclick={() => openEditPicker(schedule)}
-												class="w-full px-2 py-2 bg-teal-100 text-teal-800 rounded-md text-sm hover:bg-teal-200 transition-colors"
+												class="w-full rounded-md bg-teal-100 px-2 py-2 text-sm text-teal-800 transition-colors hover:bg-teal-200"
 											>
 												{formatTimeRange(schedule.startZeit, schedule.endZeit)}
 											</button>
 											{#if editingEntry?.id === schedule.id}
-												<div class="absolute top-full left-1/2 -translate-x-1/2 z-10 mt-1">
+												<div class="absolute top-full left-1/2 z-10 mt-1 -translate-x-1/2">
 													<TimeSlotPicker
 														startZeit={schedule.startZeit}
 														endZeit={schedule.endZeit}
@@ -199,12 +208,12 @@
 										{:else}
 											<button
 												onclick={() => openAddPicker(teacher.id, day)}
-												class="w-full px-2 py-2 border-2 border-dashed border-slate-200 rounded-md text-slate-400 hover:border-teal-400 hover:text-teal-600 transition-colors"
+												class="w-full rounded-md border-2 border-dashed border-slate-200 px-2 py-2 text-slate-400 transition-colors hover:border-teal-400 hover:text-teal-600"
 											>
 												+
 											</button>
 											{#if selectedCell?.teacherId === teacher.id && selectedCell?.date === formatDate(day)}
-												<div class="absolute top-full left-1/2 -translate-x-1/2 z-10 mt-1">
+												<div class="absolute top-full left-1/2 z-10 mt-1 -translate-x-1/2">
 													<TimeSlotPicker
 														onSave={({ startZeit, endZeit }) => {
 															const formData = new FormData();

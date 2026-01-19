@@ -15,8 +15,11 @@ Succinct rules for how to BUILD the project:
 
 Run these after implementing to get immediate feedback:
 
-- Tests: `bun test`
+- E2E Tests: `bun run test:e2e` (uses Playwright, requires dev server)
 - Lint: `bun lint`
+- Format: `bun run format`
+
+Note: Do NOT use `bun test` directly as it conflicts with Playwright. Always use `bun run test:e2e` for E2E tests.
 
 ## Operational Notes
 

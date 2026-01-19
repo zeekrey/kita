@@ -1,9 +1,11 @@
 # Spec: Teachers Management
 
 ## Overview
+
 CRUD interface for managing teachers (Erzieher).
 
 ## Route
+
 `/admin/erzieher`
 
 ---
@@ -19,17 +21,16 @@ import { db } from '$lib/server/db';
 import { erzieher } from '$lib/server/db/schema';
 
 export async function load() {
-  const allErzieher = await db.select()
-    .from(erzieher)
-    .orderBy(erzieher.nachname, erzieher.vorname);
+	const allErzieher = await db.select().from(erzieher).orderBy(erzieher.nachname, erzieher.vorname);
 
-  return { erzieher: allErzieher };
+	return { erzieher: allErzieher };
 }
 ```
 
 **File**: `src/routes/admin/erzieher/+page.svelte`
 
 **UI Requirements**:
+
 - Page title: "Erzieher"
 - "Neue/r Erzieher/in" button
 - Grid/table showing: photo, name, email
@@ -44,6 +45,7 @@ export async function load() {
 | Actions | Aktionen |
 
 **Acceptance Criteria**:
+
 - [ ] Page loads and displays teachers
 - [ ] Teachers sorted by last name, first name
 - [ ] Empty state when no teachers
@@ -61,37 +63,37 @@ export async function load() {
 | foto | Foto | file upload | No |
 
 **Validation**:
+
 - Email must be valid format
 - Email must be unique
 
 **Server Action**:
+
 ```javascript
 create: async ({ request }) => {
-  const formData = await request.formData();
-  const email = formData.get('email');
+	const formData = await request.formData();
+	const email = formData.get('email');
 
-  // Check for duplicate email
-  const existing = await db.select()
-    .from(erzieher)
-    .where(eq(erzieher.email, email))
-    .get();
+	// Check for duplicate email
+	const existing = await db.select().from(erzieher).where(eq(erzieher.email, email)).get();
 
-  if (existing) {
-    return { error: 'E-Mail bereits vorhanden' };
-  }
+	if (existing) {
+		return { error: 'E-Mail bereits vorhanden' };
+	}
 
-  await db.insert(erzieher).values({
-    vorname: formData.get('vorname'),
-    nachname: formData.get('nachname'),
-    email: email,
-    fotoPath: formData.get('fotoPath') || null
-  });
+	await db.insert(erzieher).values({
+		vorname: formData.get('vorname'),
+		nachname: formData.get('nachname'),
+		email: email,
+		fotoPath: formData.get('fotoPath') || null
+	});
 
-  return { success: true };
-}
+	return { success: true };
+};
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Form renders with all fields
 - [ ] Photo upload works
 - [ ] Email validation works
@@ -104,40 +106,41 @@ create: async ({ request }) => {
 **Route**: Modal or `/admin/erzieher/[id]/edit`
 
 **Server Action**:
+
 ```javascript
 edit: async ({ request }) => {
-  const formData = await request.formData();
-  const id = formData.get('id');
-  const email = formData.get('email');
+	const formData = await request.formData();
+	const id = formData.get('id');
+	const email = formData.get('email');
 
-  // Check for duplicate email (excluding self)
-  const existing = await db.select()
-    .from(erzieher)
-    .where(and(
-      eq(erzieher.email, email),
-      not(eq(erzieher.id, id))
-    ))
-    .get();
+	// Check for duplicate email (excluding self)
+	const existing = await db
+		.select()
+		.from(erzieher)
+		.where(and(eq(erzieher.email, email), not(eq(erzieher.id, id))))
+		.get();
 
-  if (existing) {
-    return { error: 'E-Mail bereits vorhanden' };
-  }
+	if (existing) {
+		return { error: 'E-Mail bereits vorhanden' };
+	}
 
-  await db.update(erzieher)
-    .set({
-      vorname: formData.get('vorname'),
-      nachname: formData.get('nachname'),
-      email: email,
-      fotoPath: formData.get('fotoPath') || null,
-      updatedAt: new Date()
-    })
-    .where(eq(erzieher.id, id));
+	await db
+		.update(erzieher)
+		.set({
+			vorname: formData.get('vorname'),
+			nachname: formData.get('nachname'),
+			email: email,
+			fotoPath: formData.get('fotoPath') || null,
+			updatedAt: new Date()
+		})
+		.where(eq(erzieher.id, id));
 
-  return { success: true };
-}
+	return { success: true };
+};
 ```
 
 **Acceptance Criteria**:
+
 - [ ] Form pre-filled with existing data
 - [ ] Can change/remove photo
 - [ ] Email uniqueness validated
@@ -147,11 +150,13 @@ edit: async ({ request }) => {
 ### 6.4 Implement Delete Teacher
 
 **Behavior**:
+
 - Confirmation dialog before delete
 - Check if teacher has schedule entries
 - If schedule entries exist, show warning
 
 **Server Action**:
+
 ```javascript
 delete: async ({ request }) => {
   const formData = await request.formData();
@@ -179,11 +184,13 @@ delete: async ({ request }) => {
 ```
 
 **German Labels**:
+
 - Confirm title: "Erzieher/in löschen?"
 - Confirm message: "Möchten Sie {name} wirklich löschen?"
 - Error: "Erzieher/in hat noch Dienstplan-Einträge"
 
 **Acceptance Criteria**:
+
 - [ ] Cannot delete teacher with schedule entries
 - [ ] Confirmation shows teacher's name
 - [ ] Successful delete removes teacher
@@ -191,5 +198,6 @@ delete: async ({ request }) => {
 ---
 
 ## Files to Create/Modify
+
 - `src/routes/admin/erzieher/+page.server.js`
 - `src/routes/admin/erzieher/+page.svelte`

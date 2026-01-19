@@ -1,14 +1,19 @@
 @import 'tailwindcss';
 
 :root {
-  --font-heading: 'Fraunces', serif;
-  --font-body: 'Nunito', sans-serif;
+	--font-heading: 'Fraunces', serif;
+	--font-body: 'Nunito', sans-serif;
 }
 
 html {
-  font-family: var(--font-body);
+	font-family: var(--font-body);
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--font-heading);
 }

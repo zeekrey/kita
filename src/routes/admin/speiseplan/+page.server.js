@@ -16,10 +16,7 @@ export async function load({ url }) {
 		.select()
 		.from(mahlzeiten)
 		.where(
-			and(
-				gte(mahlzeiten.datum, formatDate(weekStart)),
-				lte(mahlzeiten.datum, formatDate(weekEnd))
-			)
+			and(gte(mahlzeiten.datum, formatDate(weekStart)), lte(mahlzeiten.datum, formatDate(weekEnd)))
 		);
 
 	return {

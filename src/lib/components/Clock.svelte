@@ -26,6 +26,6 @@
 </script>
 
 <div class="text-center">
-	<div class="text-6xl font-bold text-white tracking-tight">{timeStr}</div>
-	<div class="text-xl text-slate-300 mt-2">{dateStr}</div>
+	<div class="text-6xl font-bold tracking-tight text-white">{timeStr}</div>
+	<div class="mt-2 text-xl text-slate-300">{dateStr}</div>
 </div>

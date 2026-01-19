@@ -29,7 +29,7 @@
 
 			value = result.path;
 			onUpload?.(result.path);
-		} catch (e) {
+		} catch {
 			error = 'Upload fehlgeschlagen';
 		} finally {
 			uploading = false;
@@ -45,18 +45,18 @@
 <div class="photo-upload">
 	{#if value}
 		<div class="relative inline-block">
-			<img src={value} alt="Vorschau" class="w-32 h-32 object-cover rounded-lg border" />
+			<img src={value} alt="Vorschau" class="h-32 w-32 rounded-lg border object-cover" />
 			<button
 				type="button"
 				onclick={handleRemove}
-				class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-sm hover:bg-red-600 transition-colors"
+				class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-sm text-white transition-colors hover:bg-red-600"
 			>
 				x
 			</button>
 		</div>
 	{/if}
 
-	<label class="upload-btn block mt-2">
+	<label class="upload-btn mt-2 block">
 		<input
 			type="file"
 			accept="image/jpeg,image/png,image/webp"
@@ -65,8 +65,8 @@
 			class="hidden"
 		/>
 		<span
-			class="inline-block px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg cursor-pointer transition-colors {uploading
-				? 'opacity-50 cursor-not-allowed'
+			class="inline-block cursor-pointer rounded-lg bg-gray-100 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-200 {uploading
+				? 'cursor-not-allowed opacity-50'
 				: ''}"
 		>
 			{uploading ? 'Lädt...' : value ? 'Foto ändern' : 'Foto auswählen'}
@@ -74,6 +74,6 @@
 	</label>
 
 	{#if error}
-		<p class="text-red-600 text-sm mt-2">{error}</p>
+		<p class="mt-2 text-sm text-red-600">{error}</p>
 	{/if}
 </div>

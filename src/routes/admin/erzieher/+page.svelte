@@ -46,13 +46,13 @@
 
 <div class="space-y-6">
 	<!-- Header -->
-	<div class="flex justify-between items-center">
+	<div class="flex items-center justify-between">
 		<h1 class="text-2xl font-bold text-gray-800" style="font-family: var(--font-heading);">
 			Erzieher
 		</h1>
 		<button
 			onclick={openCreateModal}
-			class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+			class="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
 		>
 			Neue/r Erzieher/in
 		</button>
@@ -60,38 +60,38 @@
 
 	<!-- Error message -->
 	{#if form?.error}
-		<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+		<div class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
 			{form.error}
 		</div>
 	{/if}
 
 	<!-- Teachers list -->
 	{#if data.erzieher.length === 0}
-		<div class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+		<div class="rounded-lg bg-white p-8 text-center text-gray-500 shadow">
 			Noch keine Erzieher vorhanden. Erstellen Sie einen neuen Eintrag.
 		</div>
 	{:else}
-		<div class="bg-white rounded-lg shadow overflow-hidden">
+		<div class="overflow-hidden rounded-lg bg-white shadow">
 			<table class="w-full">
 				<thead class="bg-gray-50">
 					<tr>
 						<th
-							class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+							class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
 						>
 							Foto
 						</th>
 						<th
-							class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+							class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
 						>
 							Name
 						</th>
 						<th
-							class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+							class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
 						>
 							E-Mail
 						</th>
 						<th
-							class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+							class="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase"
 						>
 							Aktionen
 						</th>
@@ -105,11 +105,11 @@
 									<img
 										src={teacher.fotoPath}
 										alt="{teacher.vorname} {teacher.nachname}"
-										class="w-10 h-10 rounded-full object-cover"
+										class="h-10 w-10 rounded-full object-cover"
 									/>
 								{:else}
 									<div
-										class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"
+										class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-500"
 									>
 										👤
 									</div>
@@ -123,7 +123,7 @@
 							<td class="px-6 py-4 text-right">
 								<button
 									onclick={() => openEditModal(teacher)}
-									class="text-blue-600 hover:text-blue-800 mr-4"
+									class="mr-4 text-blue-600 hover:text-blue-800"
 								>
 									Bearbeiten
 								</button>
@@ -144,9 +144,9 @@
 
 <!-- Create/Edit Modal -->
 {#if showModal}
-	<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-		<div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-			<h2 class="text-xl font-bold text-gray-800 mb-4" style="font-family: var(--font-heading);">
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+		<div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+			<h2 class="mb-4 text-xl font-bold text-gray-800" style="font-family: var(--font-heading);">
 				{editingTeacher ? 'Erzieher/in bearbeiten' : 'Neue/r Erzieher/in'}
 			</h2>
 
@@ -167,19 +167,19 @@
 				{/if}
 
 				<div>
-					<label for="vorname" class="block text-sm font-medium text-gray-700 mb-1">Vorname</label>
+					<label for="vorname" class="mb-1 block text-sm font-medium text-gray-700">Vorname</label>
 					<input
 						type="text"
 						id="vorname"
 						name="vorname"
 						bind:value={formVorname}
 						required
-						class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+						class="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
 
 				<div>
-					<label for="nachname" class="block text-sm font-medium text-gray-700 mb-1">Nachname</label
+					<label for="nachname" class="mb-1 block text-sm font-medium text-gray-700">Nachname</label
 					>
 					<input
 						type="text"
@@ -187,24 +187,24 @@
 						name="nachname"
 						bind:value={formNachname}
 						required
-						class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+						class="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
 
 				<div>
-					<label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-Mail</label>
+					<label for="email" class="mb-1 block text-sm font-medium text-gray-700">E-Mail</label>
 					<input
 						type="email"
 						id="email"
 						name="email"
 						bind:value={formEmail}
 						required
-						class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+						class="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
 
 				<div>
-					<span class="block text-sm font-medium text-gray-700 mb-1">Foto</span>
+					<span class="mb-1 block text-sm font-medium text-gray-700">Foto</span>
 					<PhotoUpload bind:value={formFotoPath} />
 					<input type="hidden" name="fotoPath" value={formFotoPath} />
 				</div>
@@ -219,7 +219,7 @@
 					</button>
 					<button
 						type="submit"
-						class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+						class="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
 					>
 						Speichern
 					</button>
@@ -231,12 +231,12 @@
 
 <!-- Delete Confirmation Modal -->
 {#if deleteConfirm}
-	<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-		<div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-			<h2 class="text-xl font-bold text-gray-800 mb-2" style="font-family: var(--font-heading);">
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+		<div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+			<h2 class="mb-2 text-xl font-bold text-gray-800" style="font-family: var(--font-heading);">
 				Erzieher/in löschen?
 			</h2>
-			<p class="text-gray-600 mb-6">
+			<p class="mb-6 text-gray-600">
 				Möchten Sie {deleteConfirm.vorname}
 				{deleteConfirm.nachname} wirklich löschen?
 			</p>
@@ -263,7 +263,7 @@
 					</button>
 					<button
 						type="submit"
-						class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+						class="rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700"
 					>
 						Löschen
 					</button>

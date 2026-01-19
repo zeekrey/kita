@@ -52,13 +52,13 @@
 
 <div class="space-y-6">
 	<!-- Header -->
-	<div class="flex justify-between items-center">
+	<div class="flex items-center justify-between">
 		<h1 class="text-2xl font-bold text-gray-800" style="font-family: var(--font-heading);">
 			Gruppen
 		</h1>
 		<button
 			onclick={openCreateModal}
-			class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+			class="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
 		>
 			Neue Gruppe
 		</button>
@@ -66,28 +66,34 @@
 
 	<!-- Error message -->
 	{#if form?.error}
-		<div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+		<div class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
 			{form.error}
 		</div>
 	{/if}
 
 	<!-- Groups list -->
 	{#if data.gruppen.length === 0}
-		<div class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+		<div class="rounded-lg bg-white p-8 text-center text-gray-500 shadow">
 			Noch keine Gruppen vorhanden. Erstellen Sie eine neue Gruppe.
 		</div>
 	{:else}
-		<div class="bg-white rounded-lg shadow overflow-hidden">
+		<div class="overflow-hidden rounded-lg bg-white shadow">
 			<table class="w-full">
 				<thead class="bg-gray-50">
 					<tr>
-						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						<th
+							class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+						>
 							Farbe
 						</th>
-						<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+						<th
+							class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+						>
 							Name
 						</th>
-						<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+						<th
+							class="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase"
+						>
 							Aktionen
 						</th>
 					</tr>
@@ -97,7 +103,7 @@
 						<tr class="hover:bg-gray-50">
 							<td class="px-6 py-4">
 								<div
-									class="w-8 h-8 rounded-full border-2 border-gray-200"
+									class="h-8 w-8 rounded-full border-2 border-gray-200"
 									style="background-color: {group.farbe}"
 								></div>
 							</td>
@@ -105,7 +111,7 @@
 							<td class="px-6 py-4 text-right">
 								<button
 									onclick={() => openEditModal(group)}
-									class="text-blue-600 hover:text-blue-800 mr-4"
+									class="mr-4 text-blue-600 hover:text-blue-800"
 								>
 									Bearbeiten
 								</button>
@@ -126,9 +132,9 @@
 
 <!-- Create/Edit Modal -->
 {#if showModal}
-	<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-		<div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-			<h2 class="text-xl font-bold text-gray-800 mb-4" style="font-family: var(--font-heading);">
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+		<div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+			<h2 class="mb-4 text-xl font-bold text-gray-800" style="font-family: var(--font-heading);">
 				{editingGroup ? 'Gruppe bearbeiten' : 'Neue Gruppe'}
 			</h2>
 
@@ -137,7 +143,7 @@
 				action={editingGroup ? '?/edit' : '?/create'}
 				use:enhance={() => {
 					return async ({ result }) => {
-						if (result.type === 'success' || (result.type === 'redirect')) {
+						if (result.type === 'success' || result.type === 'redirect') {
 							handleFormSuccess();
 						}
 					};
@@ -149,30 +155,30 @@
 				{/if}
 
 				<div>
-					<label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+					<label for="name" class="mb-1 block text-sm font-medium text-gray-700">Name</label>
 					<input
 						type="text"
 						id="name"
 						name="name"
 						bind:value={formName}
 						required
-						class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+						class="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
 						placeholder="z.B. Sonnenkäfer"
 					/>
 				</div>
 
 				<div>
-					<span class="block text-sm font-medium text-gray-700 mb-2">Farbe</span>
+					<span class="mb-2 block text-sm font-medium text-gray-700">Farbe</span>
 					<div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Farbauswahl">
-						{#each presetColors as color, i (color)}
+						{#each presetColors as color (color)}
 							<button
 								type="button"
 								onclick={() => (formFarbe = color)}
 								aria-label="Farbe {color}"
 								aria-pressed={formFarbe === color}
-								class="w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 {formFarbe ===
+								class="h-8 w-8 rounded-full border-2 transition-transform hover:scale-110 {formFarbe ===
 								color
-									? 'border-gray-800 scale-110'
+									? 'scale-110 border-gray-800'
 									: 'border-gray-200'}"
 								style="background-color: {color}"
 							></button>
@@ -191,7 +197,7 @@
 					</button>
 					<button
 						type="submit"
-						class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+						class="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
 					>
 						Speichern
 					</button>
@@ -203,12 +209,12 @@
 
 <!-- Delete Confirmation Modal -->
 {#if deleteConfirm}
-	<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-		<div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-			<h2 class="text-xl font-bold text-gray-800 mb-2" style="font-family: var(--font-heading);">
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+		<div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+			<h2 class="mb-2 text-xl font-bold text-gray-800" style="font-family: var(--font-heading);">
 				Gruppe löschen?
 			</h2>
-			<p class="text-gray-600 mb-6">
+			<p class="mb-6 text-gray-600">
 				Möchten Sie die Gruppe "{deleteConfirm.name}" wirklich löschen?
 			</p>
 
@@ -217,7 +223,7 @@
 				action="?/delete"
 				use:enhance={() => {
 					return async ({ result }) => {
-						if (result.type === 'success' || (result.type === 'redirect')) {
+						if (result.type === 'success' || result.type === 'redirect') {
 							handleFormSuccess();
 						}
 					};
@@ -234,7 +240,7 @@
 					</button>
 					<button
 						type="submit"
-						class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+						class="rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700"
 					>
 						Löschen
 					</button>

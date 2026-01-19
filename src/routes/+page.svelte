@@ -24,7 +24,7 @@
 	}
 
 	function getMealByType(type) {
-		return data.meals.find(m => m.typ === type);
+		return data.meals.find((m) => m.typ === type);
 	}
 
 	onMount(() => {
@@ -41,41 +41,47 @@
 	<title>Kita Dashboard</title>
 </svelte:head>
 
-<div class="min-h-screen bg-[#1a1a2e] text-white p-6">
-	<div class="max-w-[1920px] mx-auto h-full">
+<div class="min-h-screen bg-[#1a1a2e] p-6 text-white">
+	<div class="mx-auto h-full max-w-[1920px]">
 		<!-- Header -->
-		<header class="mb-8 animate-fade-in" style="animation-delay: 0s">
+		<header class="animate-fade-in mb-8" style="animation-delay: 0s">
 			<div class="flex items-center justify-between">
-				<h1 class="text-4xl font-bold text-white font-heading">Sonnenschein Kita</h1>
+				<h1 class="font-heading text-4xl font-bold text-white">Sonnenschein Kita</h1>
 				<Clock />
 			</div>
 		</header>
 
 		<!-- Main Grid -->
-		<div class="grid grid-cols-12 gap-6 h-[calc(100vh-200px)]">
+		<div class="grid h-[calc(100vh-200px)] grid-cols-12 gap-6">
 			<!-- Announcements Column (Left) -->
-			<section class="col-span-4 animate-fade-in" style="animation-delay: 0.1s">
-				<div class="bg-[#16213e] rounded-2xl p-6 h-full flex flex-col">
-					<h2 class="text-2xl font-bold mb-4 text-white font-heading flex items-center gap-2">
+			<section class="animate-fade-in col-span-4" style="animation-delay: 0.1s">
+				<div class="flex h-full flex-col rounded-2xl bg-[#16213e] p-6">
+					<h2 class="font-heading mb-4 flex items-center gap-2 text-2xl font-bold text-white">
 						<span>📢</span> Ankündigungen
 					</h2>
 					{#if data.announcements.length === 0}
-						<div class="flex-1 flex items-center justify-center text-slate-400">
+						<div class="flex flex-1 items-center justify-center text-slate-400">
 							<p>Keine Ankündigungen</p>
 						</div>
 					{:else}
-						<div class="flex-1 overflow-y-auto space-y-4 pr-2">
+						<div class="flex-1 space-y-4 overflow-y-auto pr-2">
 							{#each data.announcements as announcement (announcement.id)}
-								<div class="bg-[#0f3460] rounded-xl p-4 {announcement.prioritaet === 'wichtig' ? 'border-2 border-[#e94560]' : ''}">
+								<div
+									class="rounded-xl bg-[#0f3460] p-4 {announcement.prioritaet === 'wichtig'
+										? 'border-2 border-[#e94560]'
+										: ''}"
+								>
 									{#if announcement.prioritaet === 'wichtig'}
-										<div class="flex items-center gap-2 mb-2">
-											<span class="px-2 py-0.5 text-xs font-bold bg-[#e94560] text-white rounded uppercase">
+										<div class="mb-2 flex items-center gap-2">
+											<span
+												class="rounded bg-[#e94560] px-2 py-0.5 text-xs font-bold text-white uppercase"
+											>
 												Wichtig
 											</span>
 										</div>
 									{/if}
-									<h3 class="font-bold text-lg text-white mb-2">{announcement.titel}</h3>
-									<p class="text-slate-300 text-sm leading-relaxed">{announcement.nachricht}</p>
+									<h3 class="mb-2 text-lg font-bold text-white">{announcement.titel}</h3>
+									<p class="text-sm leading-relaxed text-slate-300">{announcement.nachricht}</p>
 								</div>
 							{/each}
 						</div>
@@ -87,40 +93,45 @@
 			<div class="col-span-4 flex flex-col gap-6">
 				<!-- Birthdays -->
 				<section class="animate-fade-in flex-1" style="animation-delay: 0.2s">
-					<div class="bg-[#16213e] rounded-2xl p-6 h-full flex flex-col">
-						<h2 class="text-2xl font-bold mb-4 text-white font-heading flex items-center gap-2">
+					<div class="flex h-full flex-col rounded-2xl bg-[#16213e] p-6">
+						<h2 class="font-heading mb-4 flex items-center gap-2 text-2xl font-bold text-white">
 							<span>🎂</span> Geburtstag heute
 						</h2>
 						{#if data.birthdayChildren.length === 0}
-							<div class="flex-1 flex items-center justify-center text-slate-400">
+							<div class="flex flex-1 items-center justify-center text-slate-400">
 								<p>Heute hat niemand Geburtstag</p>
 							</div>
 						{:else}
 							<div class="flex-1 overflow-y-auto">
 								<div class="grid gap-4">
 									{#each data.birthdayChildren as child (child.id)}
-										<div class="bg-gradient-to-r from-amber-500/20 to-pink-500/20 rounded-xl p-4 flex items-center gap-4 border border-amber-500/30">
+										<div
+											class="flex items-center gap-4 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/20 to-pink-500/20 p-4"
+										>
 											{#if child.fotoPath}
 												<img
 													src={child.fotoPath}
 													alt=""
-													class="w-16 h-16 rounded-full object-cover border-4 border-amber-400"
+													class="h-16 w-16 rounded-full border-4 border-amber-400 object-cover"
 												/>
 											{:else}
-												<div class="w-16 h-16 rounded-full bg-amber-500/30 flex items-center justify-center text-2xl border-4 border-amber-400">
+												<div
+													class="flex h-16 w-16 items-center justify-center rounded-full border-4 border-amber-400 bg-amber-500/30 text-2xl"
+												>
 													🎈
 												</div>
 											{/if}
 											<div>
-												<p class="font-bold text-lg text-white">
-													{child.vorname} {child.nachname}
+												<p class="text-lg font-bold text-white">
+													{child.vorname}
+													{child.nachname}
 												</p>
 												<p class="text-amber-300">
 													wird heute {calculateAge(child.geburtstag)} Jahre alt!
 												</p>
 												{#if child.gruppeName}
 													<span
-														class="inline-block mt-1 px-2 py-0.5 text-xs rounded text-white"
+														class="mt-1 inline-block rounded px-2 py-0.5 text-xs text-white"
 														style="background-color: {child.gruppeFarbe}"
 													>
 														{child.gruppeName}
@@ -140,12 +151,12 @@
 			<div class="col-span-4 flex flex-col gap-6">
 				<!-- Meals -->
 				<section class="animate-fade-in" style="animation-delay: 0.3s">
-					<div class="bg-[#16213e] rounded-2xl p-6">
-						<h2 class="text-2xl font-bold mb-4 text-white font-heading flex items-center gap-2">
+					<div class="rounded-2xl bg-[#16213e] p-6">
+						<h2 class="font-heading mb-4 flex items-center gap-2 text-2xl font-bold text-white">
 							<span>🍴</span> Speiseplan heute
 						</h2>
 						{#if data.meals.length === 0}
-							<div class="text-slate-400 text-center py-4">
+							<div class="py-4 text-center text-slate-400">
 								<p>Kein Speiseplan eingetragen</p>
 							</div>
 						{:else}
@@ -153,11 +164,11 @@
 								{#each ['fruehstueck', 'mittagessen', 'snack'] as mealType (mealType)}
 									{@const meal = getMealByType(mealType)}
 									{@const mealInfo = MEAL_TYPES[mealType]}
-									<div class="bg-[#0f3460] rounded-xl p-4 flex items-start gap-3">
+									<div class="flex items-start gap-3 rounded-xl bg-[#0f3460] p-4">
 										<span class="text-2xl">{mealInfo.icon}</span>
 										<div>
 											<p class="font-semibold text-white">{mealInfo.label}</p>
-											<p class="text-slate-300 text-sm">
+											<p class="text-sm text-slate-300">
 												{meal ? meal.beschreibung : '—'}
 											</p>
 										</div>
@@ -170,32 +181,34 @@
 
 				<!-- Teachers on Duty -->
 				<section class="animate-fade-in flex-1" style="animation-delay: 0.4s">
-					<div class="bg-[#16213e] rounded-2xl p-6 h-full flex flex-col">
-						<h2 class="text-2xl font-bold mb-4 text-white font-heading flex items-center gap-2">
+					<div class="flex h-full flex-col rounded-2xl bg-[#16213e] p-6">
+						<h2 class="font-heading mb-4 flex items-center gap-2 text-2xl font-bold text-white">
 							<span>👩‍🏫</span> Heute anwesend
 						</h2>
 						{#if data.teachersOnDuty.length === 0}
-							<div class="flex-1 flex items-center justify-center text-slate-400">
+							<div class="flex flex-1 items-center justify-center text-slate-400">
 								<p>Aktuell niemand im Dienst</p>
 							</div>
 						{:else}
 							<div class="flex-1 overflow-y-auto">
 								<div class="grid grid-cols-2 gap-3">
 									{#each data.teachersOnDuty as teacher (teacher.id)}
-										<div class="bg-[#0f3460] rounded-xl p-3 flex items-center gap-3">
+										<div class="flex items-center gap-3 rounded-xl bg-[#0f3460] p-3">
 											{#if teacher.erzieherFotoPath}
 												<img
 													src={teacher.erzieherFotoPath}
 													alt=""
-													class="w-12 h-12 rounded-full object-cover"
+													class="h-12 w-12 rounded-full object-cover"
 												/>
 											{:else}
-												<div class="w-12 h-12 rounded-full bg-teal-500/30 flex items-center justify-center text-lg text-teal-300">
+												<div
+													class="flex h-12 w-12 items-center justify-center rounded-full bg-teal-500/30 text-lg text-teal-300"
+												>
 													{teacher.erzieherVorname[0]}{teacher.erzieherNachname[0]}
 												</div>
 											{/if}
 											<div>
-												<p class="font-medium text-white text-sm">
+												<p class="text-sm font-medium text-white">
 													{teacher.erzieherVorname}
 												</p>
 												<p class="text-xs text-slate-400">
@@ -213,8 +226,8 @@
 		</div>
 
 		<!-- Refresh Indicator -->
-		<div class="fixed bottom-4 right-4 flex items-center gap-2 text-slate-500 text-sm">
-			<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+		<div class="fixed right-4 bottom-4 flex items-center gap-2 text-sm text-slate-500">
+			<span class="h-2 w-2 animate-pulse rounded-full bg-green-500"></span>
 			<span>Auto-Aktualisierung aktiv</span>
 		</div>
 	</div>

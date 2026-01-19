@@ -23,7 +23,7 @@
 			} else {
 				goto('/admin');
 			}
-		} catch (e) {
+		} catch {
 			error = 'Anmeldung fehlgeschlagen. Bitte versuchen Sie es später erneut.';
 		} finally {
 			loading = false;
@@ -31,39 +31,37 @@
 	}
 </script>
 
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
+<div class="flex min-h-screen items-center justify-center bg-gray-100">
 	<div class="w-full max-w-md">
-		<div class="bg-white rounded-lg shadow-md p-8">
-			<div class="text-center mb-8">
+		<div class="rounded-lg bg-white p-8 shadow-md">
+			<div class="mb-8 text-center">
 				<h1 class="text-2xl font-bold text-gray-800" style="font-family: var(--font-heading);">
 					Kita Admin
 				</h1>
-				<p class="text-gray-600 mt-2">Bitte melden Sie sich an</p>
+				<p class="mt-2 text-gray-600">Bitte melden Sie sich an</p>
 			</div>
 
 			{#if error}
-				<div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+				<div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
 					{error}
 				</div>
 			{/if}
 
 			<form onsubmit={handleSubmit} class="space-y-6">
 				<div>
-					<label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-						E-Mail
-					</label>
+					<label for="email" class="mb-1 block text-sm font-medium text-gray-700"> E-Mail </label>
 					<input
 						type="email"
 						id="email"
 						bind:value={email}
 						required
-						class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+						class="w-full rounded-lg border border-gray-300 px-4 py-2 transition-colors outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
 						placeholder="admin@kita.de"
 					/>
 				</div>
 
 				<div>
-					<label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+					<label for="password" class="mb-1 block text-sm font-medium text-gray-700">
 						Passwort
 					</label>
 					<input
@@ -71,7 +69,7 @@
 						id="password"
 						bind:value={password}
 						required
-						class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+						class="w-full rounded-lg border border-gray-300 px-4 py-2 transition-colors outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
 						placeholder="••••••••"
 					/>
 				</div>
@@ -79,7 +77,7 @@
 				<button
 					type="submit"
 					disabled={loading}
-					class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors"
+					class="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:bg-blue-400"
 				>
 					{loading ? 'Wird angemeldet...' : 'Anmelden'}
 				</button>

@@ -53,7 +53,11 @@
 		const vonDate = new Date(von);
 		const bisDate = new Date(bis);
 		const vonStr = vonDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
-		const bisStr = bisDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+		const bisStr = bisDate.toLocaleDateString('de-DE', {
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric'
+		});
 		return `${vonStr} - ${bisStr}`;
 	}
 
@@ -137,75 +141,83 @@
 </script>
 
 <div class="p-6">
-	<div class="flex items-center justify-between mb-6">
+	<div class="mb-6 flex items-center justify-between">
 		<h1 class="text-2xl font-bold text-slate-800">Ankündigungen</h1>
 		<button
 			onclick={openAddForm}
-			class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
+			class="rounded-md bg-teal-600 px-4 py-2 text-white transition-colors hover:bg-teal-700"
 		>
 			Neue Ankündigung
 		</button>
 	</div>
 
 	{#if showForm}
-		<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-			<div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4">
-				<h2 class="text-xl font-bold text-slate-800 mb-4">
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+			<div class="mx-4 w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+				<h2 class="mb-4 text-xl font-bold text-slate-800">
 					{editingAnnouncement ? 'Ankündigung bearbeiten' : 'Neue Ankündigung'}
 				</h2>
 
 				<div class="space-y-4">
 					<div>
-						<label for="titel" class="block text-sm font-medium text-slate-700 mb-1">Titel</label>
+						<label for="titel" class="mb-1 block text-sm font-medium text-slate-700">Titel</label>
 						<input
 							id="titel"
 							type="text"
 							bind:value={titel}
-							class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+							class="w-full rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:outline-none"
 							placeholder="Titel der Ankündigung"
 						/>
 					</div>
 
 					<div>
-						<label for="nachricht" class="block text-sm font-medium text-slate-700 mb-1">Nachricht</label>
+						<label for="nachricht" class="mb-1 block text-sm font-medium text-slate-700"
+							>Nachricht</label
+						>
 						<textarea
 							id="nachricht"
 							bind:value={nachricht}
 							rows="4"
 							maxlength="500"
-							class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+							class="w-full rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:outline-none"
 							placeholder="Inhalt der Ankündigung..."
 						></textarea>
-						<div class="text-xs text-slate-400 text-right">{nachricht.length}/500</div>
+						<div class="text-right text-xs text-slate-400">{nachricht.length}/500</div>
 					</div>
 
 					<div class="grid grid-cols-2 gap-4">
 						<div>
-							<label for="gueltigVon" class="block text-sm font-medium text-slate-700 mb-1">Gültig von</label>
+							<label for="gueltigVon" class="mb-1 block text-sm font-medium text-slate-700"
+								>Gültig von</label
+							>
 							<input
 								id="gueltigVon"
 								type="date"
 								bind:value={gueltigVon}
-								class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+								class="w-full rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:outline-none"
 							/>
 						</div>
 						<div>
-							<label for="gueltigBis" class="block text-sm font-medium text-slate-700 mb-1">Gültig bis</label>
+							<label for="gueltigBis" class="mb-1 block text-sm font-medium text-slate-700"
+								>Gültig bis</label
+							>
 							<input
 								id="gueltigBis"
 								type="date"
 								bind:value={gueltigBis}
-								class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+								class="w-full rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:outline-none"
 							/>
 						</div>
 					</div>
 
 					<div>
-						<label for="prioritaet" class="block text-sm font-medium text-slate-700 mb-1">Priorität</label>
+						<label for="prioritaet" class="mb-1 block text-sm font-medium text-slate-700"
+							>Priorität</label
+						>
 						<select
 							id="prioritaet"
 							bind:value={prioritaet}
-							class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+							class="w-full rounded-md border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:outline-none"
 						>
 							<option value="normal">Normal</option>
 							<option value="wichtig">Wichtig</option>
@@ -213,19 +225,19 @@
 					</div>
 
 					{#if error}
-						<p class="text-red-600 text-sm">{error}</p>
+						<p class="text-sm text-red-600">{error}</p>
 					{/if}
 
-					<div class="flex gap-2 justify-end pt-2">
+					<div class="flex justify-end gap-2 pt-2">
 						<button
 							onclick={closeForm}
-							class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
+							class="rounded-md px-4 py-2 text-slate-600 transition-colors hover:bg-slate-100"
 						>
 							Abbrechen
 						</button>
 						<button
 							onclick={handleSubmit}
-							class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
+							class="rounded-md bg-teal-600 px-4 py-2 text-white transition-colors hover:bg-teal-700"
 						>
 							{editingAnnouncement ? 'Speichern' : 'Erstellen'}
 						</button>
@@ -235,7 +247,7 @@
 		</div>
 	{/if}
 
-	<div class="bg-white rounded-lg shadow-sm border border-slate-200">
+	<div class="rounded-lg border border-slate-200 bg-white shadow-sm">
 		{#if data.announcements.length === 0}
 			<div class="p-8 text-center text-slate-500">
 				<p>Noch keine Ankündigungen vorhanden.</p>
@@ -244,35 +256,39 @@
 			<div class="divide-y divide-slate-100">
 				{#each data.announcements as announcement (announcement.id)}
 					{@const status = getStatus(announcement)}
-					<div class="p-4 hover:bg-slate-50 transition-colors {announcement.prioritaet === 'wichtig' ? 'border-l-4 border-red-500' : ''}">
+					<div
+						class="p-4 transition-colors hover:bg-slate-50 {announcement.prioritaet === 'wichtig'
+							? 'border-l-4 border-red-500'
+							: ''}"
+					>
 						<div class="flex items-start justify-between gap-4">
-							<div class="flex-1 min-w-0">
-								<div class="flex items-center gap-2 mb-1">
+							<div class="min-w-0 flex-1">
+								<div class="mb-1 flex items-center gap-2">
 									<h3 class="font-semibold text-slate-800">{announcement.titel}</h3>
 									{#if announcement.prioritaet === 'wichtig'}
-										<span class="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded">
+										<span class="rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
 											Wichtig
 										</span>
 									{/if}
-									<span class="px-2 py-0.5 text-xs font-medium rounded {getStatusBadge(status)}">
+									<span class="rounded px-2 py-0.5 text-xs font-medium {getStatusBadge(status)}">
 										{getStatusLabel(status)}
 									</span>
 								</div>
-								<p class="text-sm text-slate-600 mb-2 line-clamp-2">{announcement.nachricht}</p>
+								<p class="mb-2 line-clamp-2 text-sm text-slate-600">{announcement.nachricht}</p>
 								<p class="text-xs text-slate-400">
 									{formatDateRange(announcement.gueltigVon, announcement.gueltigBis)}
 								</p>
 							</div>
-							<div class="flex gap-2 shrink-0">
+							<div class="flex shrink-0 gap-2">
 								<button
 									onclick={() => openEditForm(announcement)}
-									class="px-3 py-1 text-sm text-teal-600 hover:bg-teal-50 rounded transition-colors"
+									class="rounded px-3 py-1 text-sm text-teal-600 transition-colors hover:bg-teal-50"
 								>
 									Bearbeiten
 								</button>
 								<button
 									onclick={() => handleDelete(announcement.id)}
-									class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded transition-colors"
+									class="rounded px-3 py-1 text-sm text-red-600 transition-colors hover:bg-red-50"
 								>
 									Löschen
 								</button>

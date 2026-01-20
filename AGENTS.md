@@ -23,63 +23,6 @@ Note: Do NOT use `bun test` directly as it conflicts with Playwright. Always use
 
 ## Operational Notes
 
-Succinct learnings about how to RUN the project:
-
-...
-
-### Codebase Patterns
-
-...
-
-## Architecture Guidelines
-
-### Database
-
-- Use German table/column names for domain entities (kinder, erzieher, gruppen, etc.)
-- Use English for technical columns (createdAt, updatedAt, id)
-- All tables must have UUID primary keys generated with `crypto.randomUUID()`
-- Include `createdAt` and `updatedAt` timestamps on all tables
-
-### Routes
-
-- Public routes: `/` (dashboard)
-- API routes: `/api/auth/*` (better-auth), `/api/upload` (file uploads)
-- Admin routes: `/admin/*` (protected, require authentication)
-- Use German route names for admin sections (`/admin/kinder`, `/admin/erzieher`, etc.)
-
-### Authentication
-
-- Use better-auth for session management
-- Protect all `/admin/*` routes with server-side auth checks in `+layout.server.js`
-- Login page at `/admin/login` is public
-
-### File Uploads
-
-- Store uploaded photos in `static/uploads/` directory
-- Use UUID filenames to prevent conflicts
-- Accept only image formats (jpg, png, webp)
-
-### UI/UX Guidelines
-
-- Language: German only (all user-facing text)
-- Design: Clean, modern, distinctive (avoid generic AI aesthetics)
-- Typography: Use distinctive font pairings, avoid Inter/Roboto
-- Colors: Warm, inviting palette with clear hierarchy
-- Dashboard: Optimized for widescreen monitors, auto-refresh every 30s
-
-### Code Style
-
-- Use JSDoc for type hints (no TypeScript)
-- Follow SvelteKit conventions for file structure
-- Use Svelte 5 runes ($state, $derived, $effect)
-- Prefer server-side data loading with `+page.server.js`
-
-### Tests
-
-- Use bun test runner and its dom testing capability: https://bun.com/docs/test/dom
-
----
-
 ## MCP Tools (Svelte Server)
 
 ### 1. list-sections

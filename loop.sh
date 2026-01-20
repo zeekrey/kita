@@ -55,7 +55,7 @@ while true; do
     # --verbose: Detailed execution logging
     cat "$PROMPT_FILE" | claude -p \
         --dangerously-skip-permissions \
-        --output-format=stream-json \
+        # --output-format=stream-json \
         --model opus \
         --verbose
 

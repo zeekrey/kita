@@ -1,84 +1,60 @@
-# Kita v2.0 Implementation Plan
+# Implementation Plan: Additional Public Dashboards
 
 > **Last Updated:** 2026-01-19
 > **Status:** Phase 1 complete. Role-Based Route Protection (MEDIUM #1) complete. Admin User Management (MEDIUM #2) complete. Admin Parent-Child Linking (MEDIUM #3) complete. Admin Employee-Teacher Linking (MEDIUM #4) complete. Ready for Parent Dashboard (MEDIUM #5).
 
-## Overview
+## Goal
 
-This document tracks the implementation status and priority of all features for the Kindergarten Management System. Items are organized by completion status and priority level.
+Add one more dashboard (in addition to the current root dashboard) that is available **without login** and is optimized for children on a big screen:
 
----
+- Less text, more pictures
+- Playful, clear visuals
+- Shows by picture:
+  - What food is served today
+  - Who has birthday today (big)
+  - Who has birthday in the next 10 days (small)
+  - Which teacher is available (on duty)
 
-## COMPLETED
+All dashboards must have a button to switch to another dashboard.
 
-### Phase 1 - Core Application
+## Decisions (from user)
 
-- [x] **Database schema** (`src/lib/server/db/schema.js`)
-  - Tables: `user`, `session`, `account`, `verification` (Better-Auth)
-  - Tables: `gruppen`, `kinder`, `erzieher`, `dienstplan`, `mahlzeiten`, `ankuendigungen`
-  - All relations defined with Drizzle ORM
+1. **Images:** Use `/uploads/...` paths stored in DB (`fotoPath`) when available.
+   - If there is no picture, show the person’s initials.
+2. **Auto refresh:** Keep the existing auto refresh behavior (same interval as current dashboard).
+3. **Route:** New dashboard path is `/kids`.
 
-- [x] **Authentication system** (`src/lib/server/auth.js`)
-  - Better-Auth with email/password enabled
-  - Session management working
+## Implementation Steps
 
-- [x] **Admin dashboard** (`src/routes/admin/`)
-  - Full CRUD for groups (`/admin/gruppen`)
-  - Full CRUD for children (`/admin/kinder`)
-  - Full CRUD for teachers (`/admin/erzieher`)
-  - Full CRUD for schedules (`/admin/dienstplan`)
-  - Full CRUD for meals (`/admin/speiseplan`)
-  - Full CRUD for announcements (`/admin/ankuendigungen`)
-  - Login page (`/admin/login`)
+### 1) Create the new public route
 
-- [x] **Public dashboard** (`src/routes/+page.svelte`)
-  - Today's birthdays display
-  - Today's meals display
-  - Teachers on duty display
-  - Active announcements display
+- Create `src/routes/kids/+page.svelte`
+  - Minimal text UI, large tiles/cards, playful color palette
+  - Use images when available; otherwise initials badge
+  - Add a “Switch dashboard” button linking back to `/`
+  - Keep the same auto refresh logic (e.g. `invalidateAll()` every 30s)
 
-- [x] **File upload system** (`src/lib/components/PhotoUpload.svelte`)
-  - Photo uploads for children and teachers
-  - API endpoint at `/api/upload`
+### 2) Server-side loader for /kids
 
-- [x] **Shared components** (`src/lib/components/`)
-  - `Clock.svelte` - Live clock display
-  - `TimeSlotPicker.svelte` - Schedule time selection
-  - `PhotoUpload.svelte` - Image upload handling
+- Create `src/routes/kids/+page.server.js`
+  - Reuse the same data sources as `src/routes/+page.server.js`:
+    - Meals (today)
+    - Teachers on duty (filtered to current time)
+    - Birthday children (annual birthdays by `MM-DD`)
+    - (Announcements are optional for kids view; default: omit)
 
-- [x] **E2E test suite** (`e2e/`)
-  - 19 active tests covering auth, CRUD operations, and dashboard
-  - Tests for authentication flow
-  - Tests for all admin CRUD operations
-  - Tests for public dashboard functionality
+Add computed birthday groupings:
 
-- [x] **Basic seed script** (`scripts/seed.js`)
-  - Single monolithic profile with demo data
-  - Creates groups, children, teachers, schedules, meals, announcements
+- `birthdaysToday`: children whose birthday matches today (`MM-DD`)
+- `birthdaysNext10Days`: children whose birthday is in the next 10 days (excluding today)
+  - Sort by upcoming date
+  - Limit optionally (e.g. max 12) so it stays visually tidy
 
-- [x] **Specification documents** (`specs/`)
-  - 13 spec files covering all core features
+### 3) Add dashboard switch button to the existing dashboard
 
-- [x] **Modular seed system** (`scripts/seed.js` and `scripts/seeds/`)
-  - Created modular seed system with 3 distinct profiles: testing, demo, inspection
-  - CLI orchestrator with `-p`/`--profile` flag support (includes `--help` documentation)
-  - **Testing profile** (`scripts/seeds/testing.js`):
-    - Deterministic data for E2E tests
-    - Uses `test-` prefixed IDs (e.g., `test-group-1`, `test-child-1`)
-    - Minimal data: 2 groups, 3 children, 2 teachers
-    - Fixed dates relative to test execution
-  - **Demo profile** (`scripts/seeds/demo.js`):
-    - Realistic showcase data for demonstrations
-    - 5 groups with German names
-    - 25 children with realistic German names
-    - 8 teachers
-    - 2 weeks of schedules, meals, and announcements
-  - **Inspection profile** (`scripts/seeds/inspection.js`):
-    - Edge case testing: long names, special characters, boundary dates
-    - XSS/injection test strings
-    - Empty and overcrowded groups
-  - Fixed dashboard meals test to use exact match to avoid false positives
-  - Enables reliable E2E testing and faster development iteration
+- Update `src/routes/+page.svelte`
+  - Add a small corner button (or header button) linking to `/kids`
+  - Keep design consistent with the current dashboard
 
 - [x] **Children Dashboard (Kiosk View)** (`src/routes/kinder-ansicht/`)
   - Created `/kinder-ansicht` route for child-friendly kiosk display
@@ -396,23 +372,23 @@ These items require external dependencies (API credentials) or are nice-to-have:
 
 ## Implementation Order Summary
 
-| Order | Item                              | Priority  | Dependencies         | External Deps      |
-| ----- | --------------------------------- | --------- | -------------------- | ------------------ |
-| ~~1~~ | ~~Modular Seed System~~           | COMPLETED | None                 | None               |
-| ~~2~~ | ~~Children Dashboard (Kiosk)~~    | COMPLETED | None                 | None               |
-| ~~3~~ | ~~Database Schema for Roles~~     | COMPLETED | None                 | None               |
-| ~~4~~ | ~~Role-Based Route Protection~~   | COMPLETED | Roles Schema         | None               |
-| ~~5~~ | ~~Admin User Management~~         | COMPLETED | Roles Schema         | None               |
-| ~~6~~ | ~~Admin Parent-Child Linking~~    | COMPLETED | Roles Schema, #2     | None               |
-| ~~7~~ | ~~Admin Employee-Teacher Linking~~| COMPLETED | Roles Schema, #2     | None               |
-| 5     | Parent Dashboard                  | MEDIUM    | Roles Schema, #1, #3 | None               |
-| 6     | Employee Dashboard                | MEDIUM    | Roles Schema, #1, #4 | None               |
-| 7     | Shared Dashboard Components       | MEDIUM    | Kiosk, #5            | None               |
-| 8     | Self-Registration Page            | LOW       | Roles Schema         | None               |
-| 9     | Google OAuth                      | LOW       | Roles Schema         | Google credentials |
-| 10    | Apple Sign-In                     | LOW       | Roles Schema         | Apple credentials  |
-| 11    | Social Login Buttons              | LOW       | #9, #10              | OAuth credentials  |
-| 12    | Attendance Tracking               | DEFERRED  | Many                 | None               |
+| Order | Item                               | Priority  | Dependencies         | External Deps      |
+| ----- | ---------------------------------- | --------- | -------------------- | ------------------ |
+| ~~1~~ | ~~Modular Seed System~~            | COMPLETED | None                 | None               |
+| ~~2~~ | ~~Children Dashboard (Kiosk)~~     | COMPLETED | None                 | None               |
+| ~~3~~ | ~~Database Schema for Roles~~      | COMPLETED | None                 | None               |
+| ~~4~~ | ~~Role-Based Route Protection~~    | COMPLETED | Roles Schema         | None               |
+| ~~5~~ | ~~Admin User Management~~          | COMPLETED | Roles Schema         | None               |
+| ~~6~~ | ~~Admin Parent-Child Linking~~     | COMPLETED | Roles Schema, #2     | None               |
+| ~~7~~ | ~~Admin Employee-Teacher Linking~~ | COMPLETED | Roles Schema, #2     | None               |
+| 5     | Parent Dashboard                   | MEDIUM    | Roles Schema, #1, #3 | None               |
+| 6     | Employee Dashboard                 | MEDIUM    | Roles Schema, #1, #4 | None               |
+| 7     | Shared Dashboard Components        | MEDIUM    | Kiosk, #5            | None               |
+| 8     | Self-Registration Page             | LOW       | Roles Schema         | None               |
+| 9     | Google OAuth                       | LOW       | Roles Schema         | Google credentials |
+| 10    | Apple Sign-In                      | LOW       | Roles Schema         | Apple credentials  |
+| 11    | Social Login Buttons               | LOW       | #9, #10              | OAuth credentials  |
+| 12    | Attendance Tracking                | DEFERRED  | Many                 | None               |
 
 ---
 
